@@ -25,15 +25,15 @@
  */
 'use strict';
 
-goog.provide('Blockly.zr_cpp');
+goog.provide('Blockly.RobotC');
 
 goog.require('Blockly.Generator');
 
 
-Blockly.zr_cpp = new Blockly.Generator('zr_cpp');
+Blockly.RobotC = new Blockly.Generator('RobotC');
 
 //List of accepted variable types for dropdowns
-Blockly.zr_cpp.C_VARIABLE_TYPES =
+Blockly.RobotC.C_VARIABLE_TYPES =
 	[['float', 'float'],
 	 ['int', 'int'],
 	 ['unsigned int', 'unsigned int'],
@@ -41,7 +41,7 @@ Blockly.zr_cpp.C_VARIABLE_TYPES =
 	 ['unsigned short', 'unsigned short'],
 	 ['bool', 'bool']];
 	 
-Blockly.zr_cpp.C_GLOBAL_VARS = [];
+Blockly.RobotC.C_GLOBAL_VARS = [];
 
 /**
  * List of illegal variable names.
@@ -50,7 +50,7 @@ Blockly.zr_cpp.C_GLOBAL_VARS = [];
  * accidentally clobbering a built-in object or function.
  * @private
  */
-Blockly.zr_cpp.addReservedWords(
+Blockly.RobotC.addReservedWords(
 	'alignas,alignof,and,and_eq,asm,auto,bitand,bitor,bool,break,case,catch,char,char16_t,char32_t,class,compl,const,constexpr,const_cast,continue,decltype,default,delete,do,double,dynamic_cast,else,enum,explicit,export,extern,false,float,for,friend,goto,if,inline,int,long,mutable,namespace,new,noexcept,not,not_eq,nullptr,operator,or,or_eq,private,protected,public,register,reinterpret_cast,return,short,signed,sizeof,static,static_assert,static_cast,struct,switch,template,this,thread_local,throw,true,try,typedef,typeid,typename,union,unsigned,using,virtual,void,volatile,wchar_t,while,xor,xor_eq,posix,'
 	// http://en.cppreference.com/w/cpp/keyword
 	+ 'game,api,PI,PI2,PI3,PI4,DEG2RAD,RAD2DEG' //TODO: add ZR #defines to list
@@ -60,32 +60,32 @@ Blockly.zr_cpp.addReservedWords(
  * Order of operation ENUMs.
  * http://en.cppreference.com/w/cpp/language/operator_precedence
  */
-Blockly.zr_cpp.ORDER_ATOMIC = 0;         // 0 "" ...
-Blockly.zr_cpp.ORDER_MEMBER = 2;         // . []
-Blockly.zr_cpp.ORDER_FUNCTION_CALL = 2;  // ()
-Blockly.zr_cpp.ORDER_INCREMENT = 3;      // ++
-Blockly.zr_cpp.ORDER_DECREMENT = 3;      // --
-Blockly.zr_cpp.ORDER_LOGICAL_NOT = 3;    // !
-Blockly.zr_cpp.ORDER_BITWISE_NOT = 3;    // ~
-Blockly.zr_cpp.ORDER_UNARY_PLUS = 3;     // +
-Blockly.zr_cpp.ORDER_UNARY_NEGATION = 3; // -
-Blockly.zr_cpp.ORDER_MULTIPLICATION = 5; // *
-Blockly.zr_cpp.ORDER_DIVISION = 5;       // /
-Blockly.zr_cpp.ORDER_MODULUS = 5;        // %
-Blockly.zr_cpp.ORDER_ADDITION = 6;       // +
-Blockly.zr_cpp.ORDER_SUBTRACTION = 6;    // -
-Blockly.zr_cpp.ORDER_BITWISE_SHIFT = 7;  // << >>
-Blockly.zr_cpp.ORDER_RELATIONAL = 8;     // < <= > >=
-Blockly.zr_cpp.ORDER_EQUALITY = 9;       // == != 
-Blockly.zr_cpp.ORDER_BITWISE_AND = 10;   // &
-Blockly.zr_cpp.ORDER_BITWISE_XOR = 11;   // ^
-Blockly.zr_cpp.ORDER_BITWISE_OR = 12;    // |
-Blockly.zr_cpp.ORDER_LOGICAL_AND = 13;   // &&
-Blockly.zr_cpp.ORDER_LOGICAL_OR = 14;    // ||
-Blockly.zr_cpp.ORDER_CONDITIONAL = 15;   // ?:
-Blockly.zr_cpp.ORDER_ASSIGNMENT = 15;    // = += -= *= /= %= <<= >>= ...
-Blockly.zr_cpp.ORDER_COMMA = 17;         // ,
-Blockly.zr_cpp.ORDER_NONE = 99;          // (...)
+Blockly.RobotC.ORDER_ATOMIC = 0;         // 0 "" ...
+Blockly.RobotC.ORDER_MEMBER = 2;         // . []
+Blockly.RobotC.ORDER_FUNCTION_CALL = 2;  // ()
+Blockly.RobotC.ORDER_INCREMENT = 3;      // ++
+Blockly.RobotC.ORDER_DECREMENT = 3;      // --
+Blockly.RobotC.ORDER_LOGICAL_NOT = 3;    // !
+Blockly.RobotC.ORDER_BITWISE_NOT = 3;    // ~
+Blockly.RobotC.ORDER_UNARY_PLUS = 3;     // +
+Blockly.RobotC.ORDER_UNARY_NEGATION = 3; // -
+Blockly.RobotC.ORDER_MULTIPLICATION = 5; // *
+Blockly.RobotC.ORDER_DIVISION = 5;       // /
+Blockly.RobotC.ORDER_MODULUS = 5;        // %
+Blockly.RobotC.ORDER_ADDITION = 6;       // +
+Blockly.RobotC.ORDER_SUBTRACTION = 6;    // -
+Blockly.RobotC.ORDER_BITWISE_SHIFT = 7;  // << >>
+Blockly.RobotC.ORDER_RELATIONAL = 8;     // < <= > >=
+Blockly.RobotC.ORDER_EQUALITY = 9;       // == != 
+Blockly.RobotC.ORDER_BITWISE_AND = 10;   // &
+Blockly.RobotC.ORDER_BITWISE_XOR = 11;   // ^
+Blockly.RobotC.ORDER_BITWISE_OR = 12;    // |
+Blockly.RobotC.ORDER_LOGICAL_AND = 13;   // &&
+Blockly.RobotC.ORDER_LOGICAL_OR = 14;    // ||
+Blockly.RobotC.ORDER_CONDITIONAL = 15;   // ?:
+Blockly.RobotC.ORDER_ASSIGNMENT = 15;    // = += -= *= /= %= <<= >>= ...
+Blockly.RobotC.ORDER_COMMA = 17;         // ,
+Blockly.RobotC.ORDER_NONE = 99;          // (...)
 
 /**
  * Arbitrary code to inject into locations that risk causing infinite loops.
@@ -93,35 +93,35 @@ Blockly.zr_cpp.ORDER_NONE = 99;          // (...)
  * E.g. '  checkTimeout(%1);\n'
  * @type ?string
  */
-Blockly.zr_cpp.INFINITE_LOOP_TRAP = null;
+Blockly.RobotC.INFINITE_LOOP_TRAP = null;
 
 /**
  * Initialise the database of variable names.
  */
-Blockly.zr_cpp.init = function() {
+Blockly.RobotC.init = function() {
 	// Create a dictionary of definitions to be printed before the code.
-	Blockly.zr_cpp.definitions_ = Object.create(null);
+	Blockly.RobotC.definitions_ = Object.create(null);
 	// Create a dictionary mapping desired function names in definitions_
 	// to actual function names (to avoid collisions with user functions).
-	Blockly.zr_cpp.functionNames_ = Object.create(null);
+	Blockly.RobotC.functionNames_ = Object.create(null);
 
 	if (Blockly.Variables) {
-		if (!Blockly.zr_cpp.variableDB_) {
-			Blockly.zr_cpp.variableDB_ =
-					new Blockly.Names(Blockly.zr_cpp.RESERVED_WORDS_);
+		if (!Blockly.RobotC.variableDB_) {
+			Blockly.RobotC.variableDB_ =
+					new Blockly.Names(Blockly.RobotC.RESERVED_WORDS_);
 		} else {
-			Blockly.zr_cpp.variableDB_.reset();
+			Blockly.RobotC.variableDB_.reset();
 		}
 
 		var defvars = [];
 		Blockly.Variables.allVariables();
-		var variables = Blockly.zr_cpp.C_GLOBAL_VARS;
+		var variables = Blockly.RobotC.C_GLOBAL_VARS;
 		for (var x = 0; x < variables.length; x++) {
 			defvars[x] = variables[x].type + ' ' +
-					Blockly.zr_cpp.variableDB_.getName(variables[x].name,
+					Blockly.RobotC.variableDB_.getName(variables[x].name,
 					Blockly.Variables.NAME_TYPE) + (variables[x].isArray === 'TRUE' ? '[' + variables[x].length + ']' : '') + ';';
 		}
-		Blockly.zr_cpp.definitions_['variables'] = defvars.join('\n');
+		Blockly.RobotC.definitions_['variables'] = defvars.join('\n');
 	}
 };
 
@@ -130,11 +130,11 @@ Blockly.zr_cpp.init = function() {
  * @param {string} code Generated code.
  * @return {string} Completed code.
  */
-Blockly.zr_cpp.finish = function(code) {
+Blockly.RobotC.finish = function(code) {
 	// Convert the definitions dictionary into a list.
 	var definitions = [];
-	for (var name in Blockly.zr_cpp.definitions_) {
-		definitions.push(Blockly.zr_cpp.definitions_[name]);
+	for (var name in Blockly.RobotC.definitions_) {
+		definitions.push(Blockly.RobotC.definitions_[name]);
 	}
 	return definitions.join('\n\n') + '\n\n\n' + code;
 };
@@ -145,7 +145,7 @@ Blockly.zr_cpp.finish = function(code) {
  * @param {string} line Line of generated code.
  * @return {string} Legal line of code.
  */
-Blockly.zr_cpp.scrubNakedValue = function(line) {
+Blockly.RobotC.scrubNakedValue = function(line) {
 	//ZR editor should ignore all blocks that are not children of the page's function block
 	return '';
 };
@@ -157,7 +157,7 @@ Blockly.zr_cpp.scrubNakedValue = function(line) {
  * @return {string} JavaScript string.
  * @private
  */
-Blockly.zr_cpp.quote_ = function(string) {
+Blockly.RobotC.quote_ = function(string) {
 	// TODO: This is a quick hack.  Replace with goog.string.quote
 	string = string.replace(/\\/g, '\\\\')
 								 .replace(/\n/g, '\\\n')
@@ -175,7 +175,7 @@ Blockly.zr_cpp.quote_ = function(string) {
  * @this {Blockly.CodeGenerator}
  * @private
  */
-Blockly.zr_cpp.scrub_ = function(block, code) {
+Blockly.RobotC.scrub_ = function(block, code) {
 	if (code === null) {
 		// Block has handled code generation itself.
 		return '';

@@ -25,32 +25,32 @@
  */
 'use strict';
 
-goog.provide('Blockly.zr_cpp.logic');
+goog.provide('Blockly.RobotC.logic');
 
-goog.require('Blockly.zr_cpp');
+goog.require('Blockly.RobotC');
 
 
-Blockly.zr_cpp['controls_if'] = function(block) {
+Blockly.RobotC['controls_if'] = function(block) {
   // If/elseif/else condition.
   var n = 0;
-  var argument = Blockly.zr_cpp.valueToCode(block, 'IF' + n,
-      Blockly.zr_cpp.ORDER_NONE) || 'false';
-  var branch = Blockly.zr_cpp.statementToCode(block, 'DO' + n);
+  var argument = Blockly.RobotC.valueToCode(block, 'IF' + n,
+      Blockly.RobotC.ORDER_NONE) || 'false';
+  var branch = Blockly.RobotC.statementToCode(block, 'DO' + n);
   var code = 'if (' + argument + ') {\n' + branch + '}';
   for (n = 1; n <= block.elseifCount_; n++) {
-    argument = Blockly.zr_cpp.valueToCode(block, 'IF' + n,
-        Blockly.zr_cpp.ORDER_NONE) || 'false';
-    branch = Blockly.zr_cpp.statementToCode(block, 'DO' + n);
+    argument = Blockly.RobotC.valueToCode(block, 'IF' + n,
+        Blockly.RobotC.ORDER_NONE) || 'false';
+    branch = Blockly.RobotC.statementToCode(block, 'DO' + n);
     code += ' else if (' + argument + ') {\n' + branch + '}';
   }
   if (block.elseCount_) {
-    branch = Blockly.zr_cpp.statementToCode(block, 'ELSE');
+    branch = Blockly.RobotC.statementToCode(block, 'ELSE');
     code += ' else {\n' + branch + '}';
   }
   return code + '\n';
 };
 
-Blockly.zr_cpp['logic_compare'] = function(block) {
+Blockly.RobotC['logic_compare'] = function(block) {
   // Comparison operator.
   var OPERATORS = {
     EQ: '==',
@@ -62,20 +62,20 @@ Blockly.zr_cpp['logic_compare'] = function(block) {
   };
   var operator = OPERATORS[block.getFieldValue('OP')];
   var order = (operator == '==' || operator == '!=') ?
-      Blockly.zr_cpp.ORDER_EQUALITY : Blockly.zr_cpp.ORDER_RELATIONAL;
-  var argument0 = Blockly.zr_cpp.valueToCode(block, 'A', order) || '0';
-  var argument1 = Blockly.zr_cpp.valueToCode(block, 'B', order) || '0';
+      Blockly.RobotC.ORDER_EQUALITY : Blockly.RobotC.ORDER_RELATIONAL;
+  var argument0 = Blockly.RobotC.valueToCode(block, 'A', order) || '0';
+  var argument1 = Blockly.RobotC.valueToCode(block, 'B', order) || '0';
   var code = argument0 + ' ' + operator + ' ' + argument1;
   return [code, order];
 };
 
-Blockly.zr_cpp['logic_operation'] = function(block) {
+Blockly.RobotC['logic_operation'] = function(block) {
   // Operations 'and', 'or'.
   var operator = (block.getFieldValue('OP') == 'AND') ? '&&' : '||';
-  var order = (operator == '&&') ? Blockly.zr_cpp.ORDER_LOGICAL_AND :
-      Blockly.zr_cpp.ORDER_LOGICAL_OR;
-  var argument0 = Blockly.zr_cpp.valueToCode(block, 'A', order);
-  var argument1 = Blockly.zr_cpp.valueToCode(block, 'B', order);
+  var order = (operator == '&&') ? Blockly.RobotC.ORDER_LOGICAL_AND :
+      Blockly.RobotC.ORDER_LOGICAL_OR;
+  var argument0 = Blockly.RobotC.valueToCode(block, 'A', order);
+  var argument1 = Blockly.RobotC.valueToCode(block, 'B', order);
   if (!argument0 && !argument1) {
     // If there are no arguments, then the return value is false.
     argument0 = 'false';
@@ -94,29 +94,29 @@ Blockly.zr_cpp['logic_operation'] = function(block) {
   return [code, order];
 };
 
-Blockly.zr_cpp['logic_negate'] = function(block) {
+Blockly.RobotC['logic_negate'] = function(block) {
   // Negation.
-  var order = Blockly.zr_cpp.ORDER_LOGICAL_NOT;
-  var argument0 = Blockly.zr_cpp.valueToCode(block, 'BOOL', order) ||
+  var order = Blockly.RobotC.ORDER_LOGICAL_NOT;
+  var argument0 = Blockly.RobotC.valueToCode(block, 'BOOL', order) ||
       'true';
   var code = '!' + argument0;
   return [code, order];
 };
 
-Blockly.zr_cpp['logic_boolean'] = function(block) {
+Blockly.RobotC['logic_boolean'] = function(block) {
   // Boolean values true and false.
   var code = (block.getFieldValue('BOOL') == 'TRUE') ? 'true' : 'false';
-  return [code, Blockly.zr_cpp.ORDER_ATOMIC];
+  return [code, Blockly.RobotC.ORDER_ATOMIC];
 };
 
-Blockly.zr_cpp['logic_ternary'] = function(block) {
+Blockly.RobotC['logic_ternary'] = function(block) {
   // Ternary operator.
-  var value_if = Blockly.zr_cpp.valueToCode(block, 'IF',
-      Blockly.zr_cpp.ORDER_CONDITIONAL) || 'false';
-  var value_then = Blockly.zr_cpp.valueToCode(block, 'THEN',
-      Blockly.zr_cpp.ORDER_CONDITIONAL) || 'null';
-  var value_else = Blockly.zr_cpp.valueToCode(block, 'ELSE',
-      Blockly.zr_cpp.ORDER_CONDITIONAL) || 'null';
+  var value_if = Blockly.RobotC.valueToCode(block, 'IF',
+      Blockly.RobotC.ORDER_CONDITIONAL) || 'false';
+  var value_then = Blockly.RobotC.valueToCode(block, 'THEN',
+      Blockly.RobotC.ORDER_CONDITIONAL) || 'null';
+  var value_else = Blockly.RobotC.valueToCode(block, 'ELSE',
+      Blockly.RobotC.ORDER_CONDITIONAL) || 'null';
   var code = value_if + ' ? ' + value_then + ' : ' + value_else
-  return [code, Blockly.zr_cpp.ORDER_CONDITIONAL];
+  return [code, Blockly.RobotC.ORDER_CONDITIONAL];
 };

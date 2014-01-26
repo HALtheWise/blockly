@@ -25,62 +25,62 @@
  */
 'use strict';
 
-goog.provide('Blockly.zr_cpp.variables');
+goog.provide('Blockly.RobotC.variables');
 
-goog.require('Blockly.zr_cpp');
+goog.require('Blockly.RobotC');
 
 
-Blockly.zr_cpp['variables_get'] = function(block) {
+Blockly.RobotC['variables_get'] = function(block) {
 	// Variable getter.
-	var code = Blockly.zr_cpp.variableDB_.getName(block.getFieldValue('VAR'),
+	var code = Blockly.RobotC.variableDB_.getName(block.getFieldValue('VAR'),
 			Blockly.Variables.NAME_TYPE);
-	return [code, Blockly.zr_cpp.ORDER_ATOMIC];
+	return [code, Blockly.RobotC.ORDER_ATOMIC];
 };
 
-Blockly.zr_cpp['variables_set'] = function(block) {
+Blockly.RobotC['variables_set'] = function(block) {
 	// Variable setter.
-	var argument0 = Blockly.zr_cpp.valueToCode(block, 'VALUE',
-			Blockly.zr_cpp.ORDER_ASSIGNMENT) || '0';
-	var varName = Blockly.zr_cpp.variableDB_.getName(
+	var argument0 = Blockly.RobotC.valueToCode(block, 'VALUE',
+			Blockly.RobotC.ORDER_ASSIGNMENT) || '0';
+	var varName = Blockly.RobotC.variableDB_.getName(
 			block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
 	return varName + ' = ' + argument0 + ';\n';
 };
 
-Blockly.zr_cpp['variables_declare'] = function(block) {
+Blockly.RobotC['variables_declare'] = function(block) {
 	// Declare variable. 
-	var varName = Blockly.zr_cpp.variableDB_.getName(block.getFieldValue('NAME'), Blockly.Variables.NAME_TYPE);
-	var val = Blockly.zr_cpp.valueToCode(block, 'VALUE', Blockly.zr_cpp.ORDER_ASSIGNMENT) || '0';
+	var varName = Blockly.RobotC.variableDB_.getName(block.getFieldValue('NAME'), Blockly.Variables.NAME_TYPE);
+	var val = Blockly.RobotC.valueToCode(block, 'VALUE', Blockly.RobotC.ORDER_ASSIGNMENT) || '0';
 	return varName + ' = ' + val + ';\n';
 };
 
 
-Blockly.zr_cpp['variables_array_get'] = function(block) {
+Blockly.RobotC['variables_array_get'] = function(block) {
 	//Note: Uses 0-based indices, not 1-based like other Blockly generators
-	var index = Blockly.zr_cpp.valueToCode(block, 'INDEX',
-			Blockly.zr_cpp.ORDER_NONE) || '0';
-	var array = Blockly.zr_cpp.variableDB_.getName(block.getFieldValue('ARRAY'), Blockly.Variables.NAME_TYPE) || '_';
+	var index = Blockly.RobotC.valueToCode(block, 'INDEX',
+			Blockly.RobotC.ORDER_NONE) || '0';
+	var array = Blockly.RobotC.variableDB_.getName(block.getFieldValue('ARRAY'), Blockly.Variables.NAME_TYPE) || '_';
 	var code = array + '[' + index + ']';
-	return [code, Blockly.zr_cpp.ORDER_MEMBER];
+	return [code, Blockly.RobotC.ORDER_MEMBER];
 };
 
-Blockly.zr_cpp['variables_array_set'] = function(block) {
+Blockly.RobotC['variables_array_set'] = function(block) {
 	//Note: Uses 0-based indices, not 1-based like other Blockly generators
-	var index = Blockly.zr_cpp.valueToCode(block, 'INDEX',
-			Blockly.zr_cpp.ORDER_NONE) || '0';
-	var array = Blockly.zr_cpp.variableDB_.getName(block.getFieldValue('ARRAY'), Blockly.Variables.NAME_TYPE) || '_';
-	var value = Blockly.zr_cpp.valueToCode(block, 'VALUE',
-			Blockly.zr_cpp.ORDER_ASSIGNMENT) || '0';
+	var index = Blockly.RobotC.valueToCode(block, 'INDEX',
+			Blockly.RobotC.ORDER_NONE) || '0';
+	var array = Blockly.RobotC.variableDB_.getName(block.getFieldValue('ARRAY'), Blockly.Variables.NAME_TYPE) || '_';
+	var value = Blockly.RobotC.valueToCode(block, 'VALUE',
+			Blockly.RobotC.ORDER_ASSIGNMENT) || '0';
 	return array + '[' + index + '] = ' + value + ';\n';
 };
 
-Blockly.zr_cpp['variables_array_declare'] = function(block) {
+Blockly.RobotC['variables_array_declare'] = function(block) {
 	// Declare array. 
-	var varName = Blockly.zr_cpp.variableDB_.getName(
+	var varName = Blockly.RobotC.variableDB_.getName(
 			block.getFieldValue('NAME'), Blockly.Variables.NAME_TYPE);
 	var len = block.getFieldValue('LENGTH');
 	var code = '';
 	for(var i = 0; i < len; i++) {
-		var val = Blockly.zr_cpp.valueToCode(block, 'VALUE' + i, Blockly.zr_cpp.ORDER_ASSIGNMENT) || '0';
+		var val = Blockly.RobotC.valueToCode(block, 'VALUE' + i, Blockly.RobotC.ORDER_ASSIGNMENT) || '0';
 		code = code + varName + '[' + i + '] = ' + val + ';\n';
 	}
 	return code;
