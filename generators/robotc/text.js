@@ -25,22 +25,22 @@
  */
 'use strict';
 
-goog.provide('Blockly.zr_cpp.text');
+goog.provide('Blockly.RobotC.text');
 
-goog.require('Blockly.zr_cpp');
+goog.require('Blockly.RobotC');
 
 
-Blockly.zr_cpp['debug_string'] = function(block) {
+Blockly.RobotC['debug_string'] = function(block) {
 	// Text value.
-	var code = Blockly.zr_cpp.quote_(block.getFieldValue('TEXT'));
-	return [code, Blockly.zr_cpp.ORDER_ATOMIC];
+	var code = Blockly.RobotC.quote_(block.getFieldValue('TEXT'));
+	return [code, Blockly.RobotC.ORDER_ATOMIC];
 };
 
 
 
-Blockly.zr_cpp['debug'] = function(block) {
+Blockly.RobotC['debug'] = function(block) {
 	// Print statement.
-	var argument0 = Blockly.zr_cpp.valueToCode(block, 'TEXT',
-			Blockly.zr_cpp.ORDER_NONE) || '""';
+	var argument0 = Blockly.RobotC.valueToCode(block, 'TEXT',
+			Blockly.RobotC.ORDER_NONE) || '""';
 	return 'DEBUG(( ' + argument0 + ' ));\n';
 };

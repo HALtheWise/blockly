@@ -25,88 +25,88 @@
  */
 'use strict';
 
-goog.provide('Blockly.zr_cpp.procedures');
+goog.provide('Blockly.RobotC.procedures');
 
-goog.require('Blockly.zr_cpp');
+goog.require('Blockly.RobotC');
 
 
-Blockly.zr_cpp['procedures_defreturn'] = function(block) {
+Blockly.RobotC['procedures_defreturn'] = function(block) {
 	// Define a procedure with a return value.
-	var funcName = Blockly.zr_cpp.variableDB_.getName(
+	var funcName = Blockly.RobotC.variableDB_.getName(
 			block.getFieldValue('NAME'), Blockly.Procedures.NAME_TYPE);
-	var branch = Blockly.zr_cpp.statementToCode(block, 'STACK');
+	var branch = Blockly.RobotC.statementToCode(block, 'STACK');
 	var type = block.getFieldValue('TYPE') || 'void';
-	var returnValue = Blockly.zr_cpp.valueToCode(block, 'RETURN',
-			Blockly.zr_cpp.ORDER_NONE) || '';
+	var returnValue = Blockly.RobotC.valueToCode(block, 'RETURN',
+			Blockly.RobotC.ORDER_NONE) || '';
 	if (returnValue) {
 		returnValue = '  return ' + returnValue + ';\n';
 	}
 	var code = type + ' ' + funcName + block.getArgString(true) + ' {\n' +
 			branch + returnValue + '}';
-	code = Blockly.zr_cpp.scrub_(block, code);
-	Blockly.zr_cpp.definitions_[funcName] = code;
+	code = Blockly.RobotC.scrub_(block, code);
+	Blockly.RobotC.definitions_[funcName] = code;
 	return null;
 };
 
 // Defining a procedure without a return value uses the same generator as
 // a procedure with a return value.
-Blockly.zr_cpp['procedures_defnoreturn'] =
-		Blockly.zr_cpp['procedures_defreturn'];
+Blockly.RobotC['procedures_defnoreturn'] =
+		Blockly.RobotC['procedures_defreturn'];
 
-Blockly.zr_cpp['procedures_definit'] = function(block) {
+Blockly.RobotC['procedures_definit'] = function(block) {
 	// Define a procedure with a return value.
-	var branch = Blockly.zr_cpp.statementToCode(block, 'GLOBALS') + Blockly.zr_cpp.statementToCode(block, 'STACK');
+	var branch = Blockly.RobotC.statementToCode(block, 'GLOBALS') + Blockly.RobotC.statementToCode(block, 'STACK');
 	var code = 'void init() {\n' +
 			branch + '}';
-	code = Blockly.zr_cpp.scrub_(block, code);
-	Blockly.zr_cpp.definitions_['init'] = code;
+	code = Blockly.RobotC.scrub_(block, code);
+	Blockly.RobotC.definitions_['init'] = code;
 	return null;
 };
 
-Blockly.zr_cpp['procedures_defloop'] = function(block) {
+Blockly.RobotC['procedures_defloop'] = function(block) {
 	// Define a procedure with a return value.
-	var branch = Blockly.zr_cpp.statementToCode(block, 'STACK');
+	var branch = Blockly.RobotC.statementToCode(block, 'STACK');
 	var code = 'void loop() {\n' +
 			branch + '}';
-	code = Blockly.zr_cpp.scrub_(block, code);
-	Blockly.zr_cpp.definitions_['loop'] = code;
+	code = Blockly.RobotC.scrub_(block, code);
+	Blockly.RobotC.definitions_['loop'] = code;
 	return null;
 };
 
-Blockly.zr_cpp['procedures_callreturn'] = function(block) {
+Blockly.RobotC['procedures_callreturn'] = function(block) {
 	// Call a procedure with a return value.
-	var funcName = Blockly.zr_cpp.variableDB_.getName(
+	var funcName = Blockly.RobotC.variableDB_.getName(
 			block.getFieldValue('NAME'), Blockly.Procedures.NAME_TYPE);
 	var args = [];
 	for (var x = 0; x < block.arguments_.length; x++) {
-		args[x] = Blockly.zr_cpp.valueToCode(block, 'ARG' + x,
-				Blockly.zr_cpp.ORDER_COMMA) || 'null';
+		args[x] = Blockly.RobotC.valueToCode(block, 'ARG' + x,
+				Blockly.RobotC.ORDER_COMMA) || 'null';
 	}
 	var code = funcName + '(' + args.join(', ') + ')';
-	return [code, Blockly.zr_cpp.ORDER_FUNCTION_CALL];
+	return [code, Blockly.RobotC.ORDER_FUNCTION_CALL];
 };
 
-Blockly.zr_cpp['procedures_callnoreturn'] = function(block) {
+Blockly.RobotC['procedures_callnoreturn'] = function(block) {
 	// Call a procedure with no return value.
-	var funcName = Blockly.zr_cpp.variableDB_.getName(
+	var funcName = Blockly.RobotC.variableDB_.getName(
 			block.getFieldValue('NAME'), Blockly.Procedures.NAME_TYPE);
 	var args = [];
 	for (var x = 0; x < block.arguments_.length; x++) {
-		args[x] = Blockly.zr_cpp.valueToCode(block, 'ARG' + x,
-				Blockly.zr_cpp.ORDER_COMMA) || 'null';
+		args[x] = Blockly.RobotC.valueToCode(block, 'ARG' + x,
+				Blockly.RobotC.ORDER_COMMA) || 'null';
 	}
 	var code = funcName + '(' + args.join(', ') + ');\n';
 	return code;
 };
 
-Blockly.zr_cpp['procedures_ifreturn'] = function(block) {
+Blockly.RobotC['procedures_ifreturn'] = function(block) {
 	// Conditionally return value from a procedure.
-	var condition = Blockly.zr_cpp.valueToCode(block, 'CONDITION',
-			Blockly.zr_cpp.ORDER_NONE) || 'false';
+	var condition = Blockly.RobotC.valueToCode(block, 'CONDITION',
+			Blockly.RobotC.ORDER_NONE) || 'false';
 	var code = 'if (' + condition + ') {\n';
 	if (block.hasReturnValue_) {
-		var value = Blockly.zr_cpp.valueToCode(block, 'VALUE',
-				Blockly.zr_cpp.ORDER_NONE) || 'null';
+		var value = Blockly.RobotC.valueToCode(block, 'VALUE',
+				Blockly.RobotC.ORDER_NONE) || 'null';
 		code += '  return ' + value + ';\n';
 	} else {
 		code += '  return;\n';

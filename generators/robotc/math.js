@@ -25,11 +25,11 @@
  */
 'use strict';
 
-goog.provide('Blockly.zr_cpp.math');
+goog.provide('Blockly.RobotC.math');
 
-goog.require('Blockly.zr_cpp');
+goog.require('Blockly.RobotC');
 
-Blockly.zr_cpp['math_number'] = function(block) {
+Blockly.RobotC['math_number'] = function(block) {
 	// Numeric value.
 	var code = block.getFieldValue('NUM');
 	//Validate that the input starts with a number. parseFloat will correctly ignore the trailing f on single-precision floats.
@@ -37,81 +37,81 @@ Blockly.zr_cpp['math_number'] = function(block) {
 	if(isNaN(parseFloat(code))) {
 		code = '0';
 	}
-	return [code, Blockly.zr_cpp.ORDER_ATOMIC];
+	return [code, Blockly.RobotC.ORDER_ATOMIC];
 };
 
-Blockly.zr_cpp['math_arithmetic'] = function(block) {
+Blockly.RobotC['math_arithmetic'] = function(block) {
 	// Basic arithmetic operators, and power.
 	var OPERATORS = {
-		ADD: [' + ', Blockly.zr_cpp.ORDER_ADDITION],
-		MINUS: [' - ', Blockly.zr_cpp.ORDER_SUBTRACTION],
-		MULTIPLY: [' * ', Blockly.zr_cpp.ORDER_MULTIPLICATION],
-		DIVIDE: [' / ', Blockly.zr_cpp.ORDER_DIVISION],
-		POWER: [null, Blockly.zr_cpp.ORDER_COMMA]  // Handle power separately.
+		ADD: [' + ', Blockly.RobotC.ORDER_ADDITION],
+		MINUS: [' - ', Blockly.RobotC.ORDER_SUBTRACTION],
+		MULTIPLY: [' * ', Blockly.RobotC.ORDER_MULTIPLICATION],
+		DIVIDE: [' / ', Blockly.RobotC.ORDER_DIVISION],
+		POWER: [null, Blockly.RobotC.ORDER_COMMA]  // Handle power separately.
 	};
 	var tuple = OPERATORS[block.getFieldValue('OP')];
 	var operator = tuple[0];
 	var order = tuple[1];
-	var argument0 = Blockly.zr_cpp.valueToCode(block, 'A', order) || '0';
-	var argument1 = Blockly.zr_cpp.valueToCode(block, 'B', order) || '0';
+	var argument0 = Blockly.RobotC.valueToCode(block, 'A', order) || '0';
+	var argument1 = Blockly.RobotC.valueToCode(block, 'B', order) || '0';
 	var code;
 	// Power requires a special case since it has no operator. The ZR libraries use all single-precision floats. 
 	if (!operator) {
 		code = 'powf(' + argument0 + ', ' + argument1 + ')';
-		return [code, Blockly.zr_cpp.ORDER_FUNCTION_CALL];
+		return [code, Blockly.RobotC.ORDER_FUNCTION_CALL];
 	}
 	code = argument0 + operator + argument1;
 	return [code, order];
 };
 
-Blockly.zr_cpp['math_single'] = function(block) {
+Blockly.RobotC['math_single'] = function(block) {
 	// Math operators with single operand.
 	var operator = block.getFieldValue('OP');
 	var code;
 	var arg;
 	if (operator == '-') {
 		// Negation is a special case given its different operator precedence.
-		arg = Blockly.zr_cpp.valueToCode(block, 'NUM',
-				Blockly.zr_cpp.ORDER_UNARY_NEGATION) || '0';
+		arg = Blockly.RobotC.valueToCode(block, 'NUM',
+				Blockly.RobotC.ORDER_UNARY_NEGATION) || '0';
 		if (arg[0] == '-') {
 			// --3 is not legal
 			arg = ' ' + arg;
 		}
 		code = '-' + arg;
-		return [code, Blockly.zr_cpp.ORDER_UNARY_NEGATION];
+		return [code, Blockly.RobotC.ORDER_UNARY_NEGATION];
 	}
-	arg = Blockly.zr_cpp.valueToCode(block, 'NUM',
-			Blockly.zr_cpp.ORDER_NONE) || '0';
+	arg = Blockly.RobotC.valueToCode(block, 'NUM',
+			Blockly.RobotC.ORDER_NONE) || '0';
 	// All ZR trig functions are single-precision and handled in radians, which makes most of the JS version of this unnecessary
 	code = operator + '(' + arg + ')';
-	return [code, Blockly.zr_cpp.ORDER_FUNCTION_CALL];
+	return [code, Blockly.RobotC.ORDER_FUNCTION_CALL];
 };
 
-Blockly.zr_cpp['math_constant'] = function(block) {
-	return [block.getFieldValue('CONSTANT'), Blockly.zr_cpp.ORDER_ATOMIC];
+Blockly.RobotC['math_constant'] = function(block) {
+	return [block.getFieldValue('CONSTANT'), Blockly.RobotC.ORDER_ATOMIC];
 };
 
-Blockly.zr_cpp['math_change'] = function(block) {
+Blockly.RobotC['math_change'] = function(block) {
 	// Add to a variable in place.
-	var argument0 = Blockly.zr_cpp.valueToCode(block, 'DELTA',
-			Blockly.zr_cpp.ORDER_ADDITION) || '0';
-	var varName = Blockly.zr_cpp.variableDB_.getName(
+	var argument0 = Blockly.RobotC.valueToCode(block, 'DELTA',
+			Blockly.RobotC.ORDER_ADDITION) || '0';
+	var varName = Blockly.RobotC.variableDB_.getName(
 			block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
 	return varName + ' += ' + argument0 + ';\n';
 };
 
 // Rounding functions have a single operand.
-Blockly.zr_cpp['math_round'] = Blockly.zr_cpp['math_single'];
+Blockly.RobotC['math_round'] = Blockly.RobotC['math_single'];
 // Trigonometry functions have a single operand.
-Blockly.zr_cpp['math_trig'] = Blockly.zr_cpp['math_single'];
+Blockly.RobotC['math_trig'] = Blockly.RobotC['math_single'];
 
 
-Blockly.zr_cpp['math_modulo'] = function(block) {
+Blockly.RobotC['math_modulo'] = function(block) {
 	// Remainder computation.
-	var argument0 = Blockly.zr_cpp.valueToCode(block, 'DIVIDEND',
-			Blockly.zr_cpp.ORDER_MODULUS) || '0';
-	var argument1 = Blockly.zr_cpp.valueToCode(block, 'DIVISOR',
-			Blockly.zr_cpp.ORDER_MODULUS) || '0';
+	var argument0 = Blockly.RobotC.valueToCode(block, 'DIVIDEND',
+			Blockly.RobotC.ORDER_MODULUS) || '0';
+	var argument1 = Blockly.RobotC.valueToCode(block, 'DIVISOR',
+			Blockly.RobotC.ORDER_MODULUS) || '0';
 	var code = argument0 + ' % ' + argument1;
-	return [code, Blockly.zr_cpp.ORDER_MODULUS];
+	return [code, Blockly.RobotC.ORDER_MODULUS];
 };
