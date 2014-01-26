@@ -18,7 +18,6 @@
 <script type="text/javascript" src="../../generators/python/loops.js"></script>
 <script type="text/javascript" src="../../generators/python/math.js"></script>
 <script type="text/javascript" src="../../generators/python/text.js"></script>
-<script type="text/javascript" src="../../generators/python/lists.js"></script>
 <script type="text/javascript" src="../../generators/python/colour.js"></script>
 <script type="text/javascript" src="../../generators/python/variables.js"></script>
 <script type="text/javascript" src="../../generators/python/procedures.js"></script>
@@ -252,47 +251,6 @@ h1 {
       <block type="text_trim"></block>
       <block type="text_print"></block>
       <block type="text_prompt"></block>
-    </category>
-    <category name="Lists">
-      <block type="lists_create_empty"></block>
-      <block type="lists_create_with"></block>
-      <block type="lists_repeat">
-        <value name="NUM">
-          <block type="math_number">
-            <field name="NUM">5</field>
-          </block>
-        </value>
-      </block>
-      <block type="lists_length"></block>
-      <block type="lists_isEmpty"></block>
-      <block type="lists_indexOf">
-        <value name="VALUE">
-          <block type="variables_get">
-            <field name="VAR">list</field>
-          </block>
-        </value>
-      </block>
-      <block type="lists_getIndex">
-        <value name="VALUE">
-          <block type="variables_get">
-            <field name="VAR">list</field>
-          </block>
-        </value>
-      </block>
-      <block type="lists_setIndex">
-        <value name="LIST">
-          <block type="variables_get">
-            <field name="VAR">list</field>
-          </block>
-        </value>
-      </block>
-      <block type="lists_getSublist">
-        <value name="LIST">
-          <block type="variables_get">
-            <field name="VAR">list</field>
-          </block>
-        </value>
-      </block>
     </category>
     <category name="Colour">
       <block type="colour_picker"></block>
