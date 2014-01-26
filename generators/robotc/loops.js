@@ -25,21 +25,21 @@
  */
 'use strict';
 
-goog.provide('Blockly.zr_cpp.loops');
+goog.provide('Blockly.robotc.loops');
 
-goog.require('Blockly.zr_cpp');
+goog.require('Blockly.robotc');
 
-Blockly.zr_cpp['controls_repeat_ext'] = function(block) {
+Blockly.robotc['controls_repeat_ext'] = function(block) {
 	// Repeat n times (external number).
-	var repeats = Blockly.zr_cpp.valueToCode(block, 'TIMES',
-			Blockly.zr_cpp.ORDER_ASSIGNMENT) || '0';
-	var branch = Blockly.zr_cpp.statementToCode(block, 'DO');
+	var repeats = Blockly.robotc.valueToCode(block, 'TIMES',
+			Blockly.robotc.ORDER_ASSIGNMENT) || '0';
+	var branch = Blockly.robotc.statementToCode(block, 'DO');
 	var code = '';
-	var loopVar = Blockly.zr_cpp.variableDB_.getDistinctName(
+	var loopVar = Blockly.robotc.variableDB_.getDistinctName(
 			'count', Blockly.Variables.NAME_TYPE);
 	var endVar = repeats;
 	if (!repeats.match(/^\w+$/) && !Blockly.isNumber(repeats)) {
-		var endVar = Blockly.zr_cpp.variableDB_.getDistinctName(
+		var endVar = Blockly.robotc.variableDB_.getDistinctName(
 				'repeat_end', Blockly.Variables.NAME_TYPE);
 		code += 'int ' + endVar + ' = ' + repeats + ';\n';
 	}
@@ -50,30 +50,30 @@ Blockly.zr_cpp['controls_repeat_ext'] = function(block) {
 	return code;
 };
 
-Blockly.zr_cpp['controls_whileUntil'] = function(block) {
+Blockly.robotc['controls_whileUntil'] = function(block) {
 	// While loop.
 	var until = block.getFieldValue('MODE') == 'UNTIL';
-	var argument0 = Blockly.zr_cpp.valueToCode(block, 'BOOL',
-			until ? Blockly.zr_cpp.ORDER_LOGICAL_NOT :
-			Blockly.zr_cpp.ORDER_NONE) || 'false';
-	var branch = Blockly.zr_cpp.statementToCode(block, 'DO');
+	var argument0 = Blockly.robotc.valueToCode(block, 'BOOL',
+			until ? Blockly.robotc.ORDER_LOGICAL_NOT :
+			Blockly.robotc.ORDER_NONE) || 'false';
+	var branch = Blockly.robotc.statementToCode(block, 'DO');
 	if (until) {
 		argument0 = '!' + argument0;
 	}
 	return 'while (' + argument0 + ') {\n' + branch + '}\n';
 };
 
-Blockly.zr_cpp['controls_for'] = function(block) {
+Blockly.robotc['controls_for'] = function(block) {
 	// For loop.
-	var variable0 = Blockly.zr_cpp.variableDB_.getName(
+	var variable0 = Blockly.robotc.variableDB_.getName(
 			block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
-	var argument0 = Blockly.zr_cpp.valueToCode(block, 'FROM',
-			Blockly.zr_cpp.ORDER_ASSIGNMENT) || '0';
-	var argument1 = Blockly.zr_cpp.valueToCode(block, 'TO',
-			Blockly.zr_cpp.ORDER_ASSIGNMENT) || '0';
-	var increment = Blockly.zr_cpp.valueToCode(block, 'BY',
-			Blockly.zr_cpp.ORDER_ASSIGNMENT) || '1';
-	var branch = Blockly.zr_cpp.statementToCode(block, 'DO');
+	var argument0 = Blockly.robotc.valueToCode(block, 'FROM',
+			Blockly.robotc.ORDER_ASSIGNMENT) || '0';
+	var argument1 = Blockly.robotc.valueToCode(block, 'TO',
+			Blockly.robotc.ORDER_ASSIGNMENT) || '0';
+	var increment = Blockly.robotc.valueToCode(block, 'BY',
+			Blockly.robotc.ORDER_ASSIGNMENT) || '1';
+	var branch = Blockly.robotc.statementToCode(block, 'DO');
 	var code;
 	if (Blockly.isNumber(argument0) && Blockly.isNumber(argument1) &&
 			Blockly.isNumber(increment)) {
@@ -94,19 +94,19 @@ Blockly.zr_cpp['controls_for'] = function(block) {
 		// Cache non-trivial values to variables to prevent repeated look-ups.
 		var startVar = argument0;
 		if (!argument0.match(/^\w+$/) && !Blockly.isNumber(argument0)) {
-			var startVar = Blockly.zr_cpp.variableDB_.getDistinctName(
+			var startVar = Blockly.robotc.variableDB_.getDistinctName(
 					variable0 + '_start', Blockly.Variables.NAME_TYPE);
 			code += 'int ' + startVar + ' = ' + argument0 + ';\n';
 		}
 		var endVar = argument1;
 		if (!argument1.match(/^\w+$/) && !Blockly.isNumber(argument1)) {
-			var endVar = Blockly.zr_cpp.variableDB_.getDistinctName(
+			var endVar = Blockly.robotc.variableDB_.getDistinctName(
 					variable0 + '_end', Blockly.Variables.NAME_TYPE);
 			code += 'int ' + endVar + ' = ' + argument1 + ';\n';
 		}
 		// Determine loop direction at start, in case one of the bounds
 		// changes during loop execution.
-		var incVar = Blockly.zr_cpp.variableDB_.getDistinctName(
+		var incVar = Blockly.robotc.variableDB_.getDistinctName(
 				variable0 + '_inc', Blockly.Variables.NAME_TYPE);
 		code += 'int ' + incVar + ' = ';
 		if (Blockly.isNumber(increment)) {
@@ -127,18 +127,18 @@ Blockly.zr_cpp['controls_for'] = function(block) {
 	return code;
 };
 
-Blockly.zr_cpp['controls_forEach'] = function(block) {
+Blockly.robotc['controls_forEach'] = function(block) {
 	// For each loop.
-	var variable0 = Blockly.zr_cpp.variableDB_.getName(
+	var variable0 = Blockly.robotc.variableDB_.getName(
 			block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
-	var argument0 = Blockly.zr_cpp.valueToCode(block, 'LIST',
-			Blockly.zr_cpp.ORDER_ASSIGNMENT) || '[]';
-	var branch = Blockly.zr_cpp.statementToCode(block, 'DO');
-	if (Blockly.zr_cpp.INFINITE_LOOP_TRAP) {
-		branch = Blockly.zr_cpp.INFINITE_LOOP_TRAP.replace(/%1/g,
+	var argument0 = Blockly.robotc.valueToCode(block, 'LIST',
+			Blockly.robotc.ORDER_ASSIGNMENT) || '[]';
+	var branch = Blockly.robotc.statementToCode(block, 'DO');
+	if (Blockly.robotc.INFINITE_LOOP_TRAP) {
+		branch = Blockly.robotc.INFINITE_LOOP_TRAP.replace(/%1/g,
 				'\'' + block.id + '\'') + branch;
 	}
-	var indexVar = Blockly.zr_cpp.variableDB_.getDistinctName(
+	var indexVar = Blockly.robotc.variableDB_.getDistinctName(
 			variable0 + '_index', Blockly.Variables.NAME_TYPE);
 	branch = '  ' + variable0 + ' = ' + argument0 + '[' + indexVar + '];\n' +
 			branch;
@@ -147,7 +147,7 @@ Blockly.zr_cpp['controls_forEach'] = function(block) {
 	return code;
 };
 
-Blockly.zr_cpp['controls_flow_statements'] = function(block) {
+Blockly.robotc['controls_flow_statements'] = function(block) {
 	// Flow statements: continue, break.
 	switch (block.getFieldValue('FLOW')) {
 		case 'BREAK':
