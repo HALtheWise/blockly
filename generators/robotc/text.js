@@ -30,7 +30,7 @@ goog.provide('Blockly.RobotC.text');
 goog.require('Blockly.RobotC');
 
 
-Blockly.RobotC['debug_string'] = function(block) {
+Blockly.RobotC['text'] = function(block) {
 	// Text value.
 	var code = Blockly.RobotC.quote_(block.getFieldValue('TEXT'));
 	return [code, Blockly.RobotC.ORDER_ATOMIC];
