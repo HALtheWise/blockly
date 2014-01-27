@@ -22,15 +22,24 @@
 <script type="text/javascript" src="../../generators/python/colour.js"></script>
 <script type="text/javascript" src="../../generators/python/variables.js"></script>
 <script type="text/javascript" src="../../generators/python/procedures.js"></script>
-<script type="text/javascript" src="../../generators/dart.js"></script>
-<script type="text/javascript" src="../../generators/dart/logic.js"></script>
-<script type="text/javascript" src="../../generators/dart/loops.js"></script>
-<script type="text/javascript" src="../../generators/dart/math.js"></script>
-<script type="text/javascript" src="../../generators/dart/text.js"></script>
-<script type="text/javascript" src="../../generators/dart/lists.js"></script>
-<script type="text/javascript" src="../../generators/dart/colour.js"></script>
-<script type="text/javascript" src="../../generators/dart/variables.js"></script>
-<script type="text/javascript" src="../../generators/dart/procedures.js"></script>
+<script type="text/javascript" src="../../generators/zr_cpp.js"></script>
+<script type="text/javascript" src="../../generators/zr_cpp/logic.js"></script>
+<script type="text/javascript" src="../../generators/zr_cpp/loops.js"></script>
+<script type="text/javascript" src="../../generators/zr_cpp/math.js"></script>
+<script type="text/javascript" src="../../generators/zr_cpp/text.js"></script>
+<script type="text/javascript" src="../../generators/zr_cpp/lists.js"></script>
+<script type="text/javascript" src="../../generators/zr_cpp/colour.js"></script>
+<script type="text/javascript" src="../../generators/zr_cpp/variables.js"></script>
+<script type="text/javascript" src="../../generators/zr_cpp/procedures.js"></script>
+<script type="text/javascript" src="../../generators/robotc.js"></script>
+<script type="text/javascript" src="../../generators/robotc/logic.js"></script>
+<script type="text/javascript" src="../../generators/robotc/loops.js"></script>
+<script type="text/javascript" src="../../generators/robotc/math.js"></script>
+<script type="text/javascript" src="../../generators/robotc/text.js"></script>
+<script type="text/javascript" src="../../generators/robotc/lists.js"></script>
+<script type="text/javascript" src="../../generators/robotc/colour.js"></script>
+<script type="text/javascript" src="../../generators/robotc/variables.js"></script>
+<script type="text/javascript" src="../../generators/robotc/procedures.js"></script>
 <script type="text/javascript" src="../../msg/messages.js"></script>
 <script type="text/javascript" src="../../blocks/logic.js"></script>
 <script type="text/javascript" src="../../blocks/loops.js"></script>
@@ -300,6 +309,11 @@ h1 {
       <block type="colour_rgb"></block>
       <block type="colour_blend"></block>
     </category>
+    <category name="Typed Variables">
+      <block type="variables_get"></block>
+      <block type="variables_set"></block>
+      <block type="variables_declare"></block>
+    </category>
     <category name="Variables" custom="VARIABLE"></category>
     <category name="Functions" custom="PROCEDURE"></category>
   </xml>
@@ -326,7 +340,9 @@ h1 {
     &nbsp;
     <input type="button" value="To Python" onclick="toCode('Python')">
     &nbsp;
-    <input type="button" value="To Dart" onclick="toCode('Dart')">
+    <input type="button" value="To zr_cpp" onclick="toCode('zr_cpp')">
+    &nbsp;
+    <input type="button" value="To RobotC" onclick="toCode('RobotC')">
     <br>
     <textarea id="importExport" style="width: 26%; height: 12em"></textarea>
   </p>
