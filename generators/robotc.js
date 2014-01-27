@@ -176,7 +176,7 @@ Blockly.RobotC.quote_ = function(string) {
 	string = string.replace(/\\/g, '\\\\')
 								 .replace(/\n/g, '\\\n')
 								 .replace(/'/g, '\\\'');
-	return string; //Do not add quotes so printf formatting can be used
+	return  '"' + string + '"';
 };
 
 /**
