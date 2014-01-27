@@ -127,7 +127,7 @@ Blockly.RobotC['math_number_property'] = function(block) {
   var number_to_check = Blockly.RobotC.valueToCode(block, 'NUMBER_TO_CHECK',
       Blockly.RobotC.ORDER_MULTIPLICATIVE) || '0';
   var dropdown_property = block.getFieldValue('PROPERTY');
-  var code;
+  var code = '';
   if (dropdown_property == 'PRIME') {
     var functionName = Blockly.RobotC.provideFunction_(
         'isPrime',
@@ -169,7 +169,7 @@ Blockly.RobotC['math_number_property'] = function(block) {
       break;
     case 'DIVISIBLE_BY':
       var divisor = Blockly.RobotC.valueToCode(block, 'DIVISOR',
-          Blockly.RobotC.ORDER_MULTIPLICATIVE);
+          Blockly.RobotC.ORDER_MULTIPLICATION);
       // If 'divisor' is some code that evals to 0, RobotC will raise an error.
       if (!divisor || divisor == '0') {
         return ['false', Blockly.RobotC.ORDER_ATOMIC];
@@ -177,7 +177,7 @@ Blockly.RobotC['math_number_property'] = function(block) {
       code = number_to_check + ' % ' + divisor + ' == 0';
       break;
   }
-  return [code, Blockly.RobotC.ORDER_RELATIONAL];
+  return [code, Blockly.RobotC.ORDER_NONE];
 };
 
 Blockly.RobotC['math_constrain'] = function(block) {
