@@ -69,7 +69,7 @@ Blockly.RobotC['math_single'] = function(block) {
 	var operator = block.getFieldValue('OP');
 	var code;
 	var arg;
-	if (operator == '-') {
+	if (operator == 'NEG') {
 		// Negation is a special case given its different operator precedence.
 		arg = Blockly.RobotC.valueToCode(block, 'NUM',
 				Blockly.RobotC.ORDER_UNARY_NEGATION) || '0';
@@ -83,7 +83,7 @@ Blockly.RobotC['math_single'] = function(block) {
 	arg = Blockly.RobotC.valueToCode(block, 'NUM',
 			Blockly.RobotC.ORDER_NONE) || '0';
 	// All ZR trig functions are single-precision and handled in radians, which makes most of the JS version of this unnecessary
-	code = operator + '(' + arg + ')';
+	code = operator.toLowerCase() + '(' + arg + ')';
 	return [code, Blockly.RobotC.ORDER_FUNCTION_CALL];
 };
 
