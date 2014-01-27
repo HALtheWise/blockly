@@ -120,3 +120,19 @@ Blockly.RobotC['math_modulo'] = function(block) {
 	var code = argument0 + ' % ' + argument1;
 	return [code, Blockly.RobotC.ORDER_MODULUS];
 };
+
+Blockly.RobotC['math_constrain'] = function(block) {
+  // Constrain a number between two limits.
+  var argument0 = Blockly.Python.valueToCode(block, 'VALUE',
+      Blockly.Python.ORDER_NONE) || '0';
+  var argument1 = Blockly.Python.valueToCode(block, 'LOW',
+      Blockly.Python.ORDER_NONE) || '0';
+  /**
+   * TODO: Need to change default max value to be infinity.
+   */
+  var argument2 = Blockly.Python.valueToCode(block, 'HIGH',
+      Blockly.Python.ORDER_NONE) || '0';
+  var code = 'min(max(' + argument0 + ', ' + argument1 + '), ' +
+      argument2 + ')';
+  return [code, Blockly.Python.ORDER_FUNCTION_CALL];
+};
