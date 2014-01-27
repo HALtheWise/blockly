@@ -118,13 +118,23 @@ Blockly.RobotC.init = function() {
 		}
 
 		var defvars = [];
-		Blockly.Variables.allVariables();
-		var variables = Blockly.RobotC.C_GLOBAL_VARS;
+		//As seen in zr_cpp:
+		//Blockly.Variables.allVariables();
+		//var variables = Blockly.RobotC.C_GLOBAL_VARS;
+		var variables = Blockly.Variables.allVariables();
+		for (var i = 0; i < variables.length; i++) {
+			defvars[i] = 'float ' +
+					Blockly.RobotC.variableDB_.getName(variables[i],
+					Blockly.Variables.NAME_TYPE) + ';';
+		}
+		/**
+		 * TODO: typed variables
 		for (var x = 0; x < variables.length; x++) {
 			defvars[x] = variables[x].type + ' ' +
 					Blockly.RobotC.variableDB_.getName(variables[x].name,
 					Blockly.Variables.NAME_TYPE) + (variables[x].isArray === 'TRUE' ? '[' + variables[x].length + ']' : '') + ';';
 		}
+		*/
 		Blockly.RobotC.definitions_['variables'] = defvars.join('\n');
 	}
 };
@@ -151,11 +161,11 @@ Blockly.RobotC.finish = function(code) {
  */
 Blockly.RobotC.scrubNakedValue = function(line) {
 	//ZR editor should ignore all blocks that are not children of the page's function block
-	return '';
+	return line + ';';
 };
 
 /**
- * Encode a string as a properly escaped JavaScript string, complete with
+ * Encode a string as a properly escaped string, complete with
  * quotes.
  * @param {string} string Text to encode.
  * @return {string} JavaScript string.
