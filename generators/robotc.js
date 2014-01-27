@@ -33,6 +33,10 @@ goog.require('Blockly.Generator');
 Blockly.RobotC = new Blockly.Generator('RobotC');
 
 //List of accepted variable types for dropdowns
+/**
+ * These are unused in the current implementation, which treats everything as floats
+ * TODO: add support for typing
+ */
 Blockly.RobotC.C_VARIABLE_TYPES =
 	[['float', 'float'],
 	 ['int', 'int'],
@@ -96,7 +100,7 @@ Blockly.RobotC.ORDER_NONE = 99;          // (...)
 Blockly.RobotC.INFINITE_LOOP_TRAP = null;
 
 /**
- * Initialise the database of variable names.
+ * Initialize the database of variable names.
  */
 Blockly.RobotC.init = function() {
 	// Create a dictionary of definitions to be printed before the code.
