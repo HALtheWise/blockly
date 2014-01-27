@@ -121,18 +121,77 @@ Blockly.RobotC['math_modulo'] = function(block) {
 	return [code, Blockly.RobotC.ORDER_MODULUS];
 };
 
+Blockly.RobotC['math_number_property'] = function(block) {
+  // Check if a number is even, odd, prime, whole, positive, or negative
+  // or if it is divisible by certain number. Returns true or false.
+  var number_to_check = Blockly.RobotC.valueToCode(block, 'NUMBER_TO_CHECK',
+      Blockly.RobotC.ORDER_MULTIPLICATIVE) || '0';
+  var dropdown_property = block.getFieldValue('PROPERTY');
+  var code;
+  if (dropdown_property == 'PRIME') {
+    var functionName = Blockly.RobotC.provideFunction_(
+        'isPrime',
+        ['bool ' + Blockly.RobotC.FUNCTION_NAME_PLACEHOLDER_ + '(int n):',
+         '  # https://en.wikipedia.org/wiki/Primality_test#Naive_methods',
+         '  if (n == 2 || n == 3){',
+         '    return true;',
+         '  }',
+         '  # False if n is negative, is 1, or not whole,' +
+             ' or if n is divisible by 2 or 3.',
+         '  if (n <= 1 || n % 2 == 0 || n % 3 == 0){',
+         '    return false;',
+         '  }',
+         '  # Check all the numbers of form 6k +/- 1, up to sqrt(n).',
+         '  for (x = 6; x <= sqrt(n); x += 6) {',
+         '    if (n % (x - 1) == 0 || n % (x + 1) == 0){',
+         '      return false;',
+         '    }',
+         '  }',
+         '  return true;']);
+    code = functionName + '(' + number_to_check + ')';
+    return [code, Blockly.RobotC.ORDER_FUNCTION_CALL];
+  }
+  switch (dropdown_property) {
+    case 'EVEN':
+      code = number_to_check + ' % 2 == 0';
+      break;
+    case 'ODD':
+      code = number_to_check + ' % 2 == 1';
+      break;
+    case 'WHOLE':
+      code = number_to_check + ' % 1 == 0';
+      break;
+    case 'POSITIVE':
+      code = number_to_check + ' > 0';
+      break;
+    case 'NEGATIVE':
+      code = number_to_check + ' < 0';
+      break;
+    case 'DIVISIBLE_BY':
+      var divisor = Blockly.RobotC.valueToCode(block, 'DIVISOR',
+          Blockly.RobotC.ORDER_MULTIPLICATIVE);
+      // If 'divisor' is some code that evals to 0, RobotC will raise an error.
+      if (!divisor || divisor == '0') {
+        return ['false', Blockly.RobotC.ORDER_ATOMIC];
+      }
+      code = number_to_check + ' % ' + divisor + ' == 0';
+      break;
+  }
+  return [code, Blockly.RobotC.ORDER_RELATIONAL];
+};
+
 Blockly.RobotC['math_constrain'] = function(block) {
   // Constrain a number between two limits.
-  var argument0 = Blockly.Python.valueToCode(block, 'VALUE',
+  var argument0 = Blockly.RobotC.valueToCode(block, 'VALUE',
       Blockly.Python.ORDER_NONE) || '0';
-  var argument1 = Blockly.Python.valueToCode(block, 'LOW',
+  var argument1 = Blockly.RobotC.valueToCode(block, 'LOW',
       Blockly.Python.ORDER_NONE) || '0';
   /**
    * TODO: Need to change default max value to be infinity.
    */
-  var argument2 = Blockly.Python.valueToCode(block, 'HIGH',
-      Blockly.Python.ORDER_NONE) || '0';
+  var argument2 = Blockly.RobotC.valueToCode(block, 'HIGH',
+      Blockly.RobotC.ORDER_NONE) || '0';
   var code = 'min(max(' + argument0 + ', ' + argument1 + '), ' +
       argument2 + ')';
-  return [code, Blockly.Python.ORDER_FUNCTION_CALL];
+  return [code, Blockly.RobotC.ORDER_FUNCTION_CALL];
 };
