@@ -121,6 +121,7 @@ Blockly.RobotC['math_modulo'] = function(block) {
 	return [code, Blockly.RobotC.ORDER_MODULUS];
 };
 
+/*
 Blockly.RobotC['math_number_property'] = function(block) {
   // Check if a number is even, odd, prime, whole, positive, or negative
   // or if it is divisible by certain number. Returns true or false.
@@ -178,7 +179,7 @@ Blockly.RobotC['math_number_property'] = function(block) {
       break;
   }
   return [code, Blockly.RobotC.ORDER_NONE];
-};
+};*/
 
 Blockly.RobotC['math_constrain'] = function(block) {
   // Constrain a number between two limits.
