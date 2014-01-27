@@ -83,7 +83,8 @@ Blockly.RobotC['math_single'] = function(block) {
 	arg = Blockly.RobotC.valueToCode(block, 'NUM',
 			Blockly.RobotC.ORDER_NONE) || '0';
 	// All ZR trig functions are single-precision and handled in radians, which makes most of the JS version of this unnecessary
-	code = operator.toLowerCase() + '(' + arg + ')';
+	const var operatorTranslation = {'root': 'sqrt', 'abs':'abs', 'ln': 'log', 'log10': 'log10', 'exp': 'exp', 'pow10': '10^'};
+	code = operatorTranslation[operator.toLowerCase()] + '(' + arg + ')';
 	return [code, Blockly.RobotC.ORDER_FUNCTION_CALL];
 };
 
