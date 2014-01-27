@@ -3,8 +3,6 @@
  *
  * Copyright 2012 Google Inc.
  * http://blockly.googlecode.com/
- * and 2014 Massachusetts Institute of Technology
- * http://zerorobotics.org/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +20,8 @@
 /**
  * @fileoverview Utility functions for handling variables and procedure names.
  * Note that variables and procedures share the same name space, meaning that
- * one can't have a variable and a procedure of the same name. Modified for ZR C++ variable scoping. 
- * @author fraser@google.com (Neil Fraser), dininno@mit.edu (Ethan DiNinno)
+ * one can't have a variable and a procedure of the same name.
+ * @author fraser@google.com (Neil Fraser)
  */
 'use strict';
 
@@ -46,35 +44,33 @@ Blockly.Variables.NAME_TYPE = 'VARIABLE';
  * @return {!Array.<string>} Array of variable names.
  */
 Blockly.Variables.allVariables = function(opt_block) {
-	var blocks;
-	if (opt_block) {
-		blocks = opt_block.getDescendants();
-	} else {
-		blocks = Blockly.mainWorkspace.getAllBlocks();
-	}
-	var variableHash = Object.create(null);
-	// Iterate through every block and add each variable to the hash.
-	for (var x = 0; x < blocks.length; x++) {
-		var func = blocks[x].getVars;
-		if (func) {
-			var blockVariables = func.call(blocks[x]);
-			for (var y = 0; y < blockVariables.length; y++) {
-				var variable = blockVariables[y];
-				// Variable name may be null if the block is only half-built.
-				if (variable.name) {
-					variableHash[variable.name.toLowerCase()] = variable;
-				}
-			}
-		}
-	}
-	// Flatten the hash into a list.
-	var variableList = [];
-	for (var name in variableHash) {
-		variableList.push(variableHash[name]);
-	}
-	//To the variables from this workspace, add the list of global variables
-	variableList = variableList.concat(Blockly.zr_cpp.C_GLOBAL_VARS); 
-	return variableList;
+  var blocks;
+  if (opt_block) {
+    blocks = opt_block.getDescendants();
+  } else {
+    blocks = Blockly.mainWorkspace.getAllBlocks();
+  }
+  var variableHash = Object.create(null);
+  // Iterate through every block and add each variable to the hash.
+  for (var x = 0; x < blocks.length; x++) {
+    var func = blocks[x].getVars;
+    if (func) {
+      var blockVariables = func.call(blocks[x]);
+      for (var y = 0; y < blockVariables.length; y++) {
+        var varName = blockVariables[y];
+        // Variable name may be null if the block is only half-built.
+        if (varName) {
+          variableHash[varName.toLowerCase()] = varName;
+        }
+      }
+    }
+  }
+  // Flatten the hash into a list.
+  var variableList = [];
+  for (var name in variableHash) {
+    variableList.push(variableHash[name]);
+  }
+  return variableList;
 };
 
 /**
@@ -83,14 +79,14 @@ Blockly.Variables.allVariables = function(opt_block) {
  * @param {string} newName New variable name.
  */
 Blockly.Variables.renameVariable = function(oldName, newName) {
-	var blocks = Blockly.mainWorkspace.getAllBlocks();
-	// Iterate through every block.
-	for (var x = 0; x < blocks.length; x++) {
-		var func = blocks[x].renameVar;
-		if (func) {
-			func.call(blocks[x], oldName, newName);
-		}
-	}
+  var blocks = Blockly.mainWorkspace.getAllBlocks();
+  // Iterate through every block.
+  for (var x = 0; x < blocks.length; x++) {
+    var func = blocks[x].renameVar;
+    if (func) {
+      func.call(blocks[x], oldName, newName);
+    }
+  }
 };
 
 /**
@@ -101,42 +97,37 @@ Blockly.Variables.renameVariable = function(oldName, newName) {
  * @param {!Blockly.Workspace} workspace The flyout's workspace.
  */
 Blockly.Variables.flyoutCategory = function(blocks, gaps, margin, workspace) {
-	var variableList = Blockly.Variables.allVariables();
-	//Convert to list of names
-	var len = variableList.length;
-	for (var j = 0; j < len; j++) {
-		variableList[j] = variableList[j].name;
-	}
-	variableList.sort(goog.string.caseInsensitiveCompare);
-	// In addition to the user's variables, we also want to display the default
-	// variable name at the top.  We also don't want this duplicated if the
-	// user has created a variable of the same name.
-	variableList.unshift(null);
-	var defaultVariable = undefined;
-	for (var i = 0; i < variableList.length; i++) {
-		if (variableList[i] === defaultVariable) {
-			continue;
-		}
-		var getBlock = Blockly.Blocks['variables_get'] ?
-				Blockly.Block.obtain(workspace, 'variables_get') : null;
-		getBlock && getBlock.initSvg();
-		var setBlock = Blockly.Blocks['variables_set'] ?
-				Blockly.Block.obtain(workspace, 'variables_set') : null;
-		setBlock && setBlock.initSvg();
-		if (variableList[i] === null) {
-			defaultVariable = (getBlock || setBlock).getVars()[0];
-		} else {
-			getBlock && getBlock.setFieldValue(variableList[i], 'VAR');
-			setBlock && setBlock.setFieldValue(variableList[i], 'VAR');
-		}
-		setBlock && blocks.push(setBlock);
-		getBlock && blocks.push(getBlock);
-		if (getBlock && setBlock) {
-			gaps.push(margin, margin * 3);
-		} else {
-			gaps.push(margin * 2);
-		}
-	}
+  var variableList = Blockly.Variables.allVariables();
+  variableList.sort(goog.string.caseInsensitiveCompare);
+  // In addition to the user's variables, we also want to display the default
+  // variable name at the top.  We also don't want this duplicated if the
+  // user has created a variable of the same name.
+  variableList.unshift(null);
+  var defaultVariable = undefined;
+  for (var i = 0; i < variableList.length; i++) {
+    if (variableList[i] === defaultVariable) {
+      continue;
+    }
+    var getBlock = Blockly.Blocks['variables_get'] ?
+        Blockly.Block.obtain(workspace, 'variables_get') : null;
+    getBlock && getBlock.initSvg();
+    var setBlock = Blockly.Blocks['variables_set'] ?
+        Blockly.Block.obtain(workspace, 'variables_set') : null;
+    setBlock && setBlock.initSvg();
+    if (variableList[i] === null) {
+      defaultVariable = (getBlock || setBlock).getVars()[0];
+    } else {
+      getBlock && getBlock.setFieldValue(variableList[i], 'VAR');
+      setBlock && setBlock.setFieldValue(variableList[i], 'VAR');
+    }
+    setBlock && blocks.push(setBlock);
+    getBlock && blocks.push(getBlock);
+    if (getBlock && setBlock) {
+      gaps.push(margin, margin * 3);
+    } else {
+      gaps.push(margin * 2);
+    }
+  }
 };
 
 /**
@@ -146,45 +137,45 @@ Blockly.Variables.flyoutCategory = function(blocks, gaps, margin, workspace) {
 * @return {string} New variable name.
 */
 Blockly.Variables.generateUniqueName = function() {
-	var variableList = Blockly.Variables.allVariables();
-	var newName = '';
-	if (variableList.length) {
-		variableList.sort(goog.string.caseInsensitiveCompare);
-		var nameSuffix = 0, potName = 'i', i = 0, inUse = false;
-		while (!newName) {
-			i = 0;
-			inUse = false;
-			while (i < variableList.length && !inUse) {
-				if (variableList[i].toLowerCase() == potName) {
-					// This potential name is already used.
-					inUse = true;
-				}
-				i++;
-			}
-			if (inUse) {
-				// Try the next potential name.
-				if (potName[0] === 'z') {
-					// Reached the end of the character sequence so back to 'a' but with
-					// a new suffix.
-					nameSuffix++;
-					potName = 'a';
-				} else {
-					potName = String.fromCharCode(potName.charCodeAt(0) + 1);
-					if (potName[0] == 'l') {
-						// Avoid using variable 'l' because of ambiguity with '1'.
-						potName = String.fromCharCode(potName.charCodeAt(0) + 1);
-					}
-				}
-				if (nameSuffix > 0) {
-					potName += nameSuffix;
-				}
-			} else {
-				// We can use the current potential name.
-				newName = potName;
-			}
-		}
-	} else {
-		newName = 'i';
-	}
-	return newName;
+  var variableList = Blockly.Variables.allVariables();
+  var newName = '';
+  if (variableList.length) {
+    variableList.sort(goog.string.caseInsensitiveCompare);
+    var nameSuffix = 0, potName = 'i', i = 0, inUse = false;
+    while (!newName) {
+      i = 0;
+      inUse = false;
+      while (i < variableList.length && !inUse) {
+        if (variableList[i].toLowerCase() == potName) {
+          // This potential name is already used.
+          inUse = true;
+        }
+        i++;
+      }
+      if (inUse) {
+        // Try the next potential name.
+        if (potName[0] === 'z') {
+          // Reached the end of the character sequence so back to 'a' but with
+          // a new suffix.
+          nameSuffix++;
+          potName = 'a';
+        } else {
+          potName = String.fromCharCode(potName.charCodeAt(0) + 1);
+          if (potName[0] == 'l') {
+            // Avoid using variable 'l' because of ambiguity with '1'.
+            potName = String.fromCharCode(potName.charCodeAt(0) + 1);
+          }
+        }
+        if (nameSuffix > 0) {
+          potName += nameSuffix;
+        }
+      } else {
+        // We can use the current potential name.
+        newName = potName;
+      }
+    }
+  } else {
+    newName = 'i';
+  }
+  return newName;
 };
