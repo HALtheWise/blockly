@@ -31,19 +31,22 @@ goog.require('Blockly.RobotC');
 Blockly.RobotC['cblocks_case'] = function(block) {
   // If/elseif/else condition.
   var n = 0;
-  var argument = Blockly.Python.valueToCode(block, 'INPUT',
-      Blockly.Python.ORDER_NONE) || 'False';
+  var argument = Blockly.RobotC.valueToCode(block, 'INPUT',
+      Blockly.RobotC.ORDER_NONE) || '0';
   var code = 'switch(' + argument + '){\n';
   var innercode = '';
-  for (n = 1; n <= block.elseifCount_; n++) {
-    argument = Blockly.Python.valueToCode(block, 'IF' + n,
-        Blockly.Python.ORDER_NONE) || 'False';
-    branch = Blockly.Python.statementToCode(block, 'DO' + n) || '  pass\n';
-    innercode += 'elif ' + argument + ':\n' + branch;
+  for (n = 1; n <= block.caseCount_; n++) {
+    argument = Blockly.RobotC.valueToCode(block, 'CHOICE' + n,
+        Blockly.RobotC.ORDER_NONE) || '0';
+    var branch = Blockly.RobotC.statementToCode(block, 'DO' + n);
+    innercode += 'case ' + argument + ':\n' + branch + 'break;\n';
   }
   if (block.defaultCount_) {
-    branch = Blockly.Python.statementToCode(block, 'ELSE') || '  pass\n';
+    branch = Blockly.RobotC.statementToCode(block, 'DEFAULT') || '\n';
     innercode += 'default:\n' + branch;
   }
-  return code + innercode + '}\n';
+  /**
+   * TODO: Handle indentation better
+   */
+  return code + Blockly.RobotC.prefixLines(innercode, '  ') + '}\n';
 };
