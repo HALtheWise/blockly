@@ -89,8 +89,8 @@ Blockly.Blocks['cblocks_constants_declare'] = {
 		// Merge runs of whitespace.  Strip leading and trailing whitespace.
 		// Beyond this, all names are legal.
 		newVar = newVar.split(' ').join('_').toUpperCase();
+		setTimeout(Blockly.RobotC.discoverConstants,0);
 		return newVar || null;
-		Blockly.RobotC.discoverConstants();
 	}
 };
 
