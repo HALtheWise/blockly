@@ -78,7 +78,7 @@ Blockly.Blocks['cblocks_case'] = {
     for (var x = 1; x <= this.caseCount_; x++) {
       this.appendValueInput('CHOICE' + x)
           .setCheck('Number')
-          .appendField(Blockly.Msg.CONTROLS_IF_MSG_ELSEIF);
+          .appendField("If switch = ");
       this.appendStatementInput('DO' + x)
           .appendField(Blockly.Msg.CONTROLS_IF_MSG_THEN);
     }
@@ -88,8 +88,9 @@ Blockly.Blocks['cblocks_case'] = {
     }
   },
   decompose: function(workspace) {
-    var containerBlock = Blockly.Block.obtain(workspace, 'cblocks_case_case');
+    var containerBlock = Blockly.Block.obtain(workspace, 'cblocks_case_switch');
     containerBlock.initSvg();
+    console.log(containerBlock);
     var connection = containerBlock.getInput('STACK').connection;
     for (var x = 1; x <= this.caseCount_; x++) {
       var caseBlock = Blockly.Block.obtain(workspace, 'cblocks_case_case');
@@ -124,7 +125,7 @@ Blockly.Blocks['cblocks_case'] = {
           this.caseCount_++;
           var ifInput = this.appendValueInput('CHOICE' + this.caseCount_)
               .setCheck('Number')
-              .appendField(Blockly.Msg.CONTROLS_IF_MSG_ELSEIF);
+              .appendField("If switch = ");
           var doInput = this.appendStatementInput('DO' + this.caseCount_);
           doInput.appendField(Blockly.Msg.CONTROLS_IF_MSG_THEN);
           // Reconnect any child blocks.
@@ -180,7 +181,7 @@ Blockly.Blocks['cblocks_case'] = {
   }
 };
 
-Blockly.Blocks['cblocks_case_case'] = {
+Blockly.Blocks['cblocks_case_switch'] = {
   // If condition.
   init: function() {
     this.setColour(210);
