@@ -28,7 +28,7 @@ goog.provide('Blockly.RobotC.case');
 goog.require('Blockly.RobotC');
 
 
-Blockly.Python['controls_if'] = function(block) {
+Blockly.RobotC['cblocks_case'] = function(block) {
   // If/elseif/else condition.
   var n = 0;
   var argument = Blockly.Python.valueToCode(block, 'INPUT',
