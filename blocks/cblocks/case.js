@@ -34,7 +34,7 @@ Blockly.Blocks['cblocks_case'] = {
   init: function() {
     this.setHelpUrl(Blockly.Msg.CONTROLS_IF_HELPURL);
     this.setColour(210);
-    this.appendValueInput('Input')
+    this.appendValueInput('INPUT')
         .setCheck('Number')
         .appendField("switch");
     this.setPreviousStatement(true);
