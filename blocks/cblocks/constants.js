@@ -3,8 +3,6 @@
  *
  * Copyright 2012 Google Inc.
  * http://blockly.googlecode.com/
- * and 2014 Massachusetts Institute of Technology
- * http://zerorobotics.org/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +18,8 @@
  */
 
 /**
- * @fileoverview Variable and list blocks for Blockly. Modified for ZR C++ API.
- * @author fraser@google.com (Neil Fraser), dininno@mit.edu (Ethan DiNinno)
+ * @fileoverview Constant blocks for Blockly
+ * @author fraser@google.com (Neil Fraser), eric@legoaces.org (Eric Miller)
  */
 'use strict';
 
