@@ -64,24 +64,21 @@ Blockly.Blocks['cblocks_constants_get'] = {
 Blockly.Blocks['cblocks_constants_declare'] = {
 	init: function() {
 		// Global #define declaration
-		if (typeof(Blockly.RobotC.constants) == 'undefined'){
-			Blockly.RobotC.constants = [];
-		}
 		this.setColour(330);
 		this.appendDummyInput()
-				.appendField('type:')
-				.appendField(new Blockly.FieldDropdown(Blockly.zr_cpp.C_VARIABLE_TYPES), 'TYPE')
 				.appendField('name:')
 				.appendField(new Blockly.FieldTextInput('myVariable', this.validator), 'NAME')
-				.appendField('initial value:');
+				.appendField('Value:');
 		this.appendValueInput('VALUE');
 		this.setInputsInline(true);
 		this.setPreviousStatement(true);
 		this.setNextStatement(true);
 		this.setTooltip('');
+		Blockly.RobotC.discoverConstants();
 	},
-	getConstant: function() {
+	getConstants: function() {
 		//Has different name from getVars so the variable will not be double counted
+		return [[this.getFieldValue('NAME'), this]];
 		return {
 			type: this.getFieldValue('TYPE'),
 			name: this.getFieldValue('NAME'),
@@ -91,9 +88,45 @@ Blockly.Blocks['cblocks_constants_declare'] = {
 	validator: function(newVar) {
 		// Merge runs of whitespace.  Strip leading and trailing whitespace.
 		// Beyond this, all names are legal.
-		newVar = newVar.replace(/[\s\xa0]+/g, ' ').replace(/ */g, '_');
+		newVar = newVar.split(' ').join('_').toUpperCase();
 		return newVar || null;
+		Blockly.RobotC.discoverConstants();
 	}
+};
+
+Blockly.RobotC.discoverConstants = function(opt_block) {
+	var blocks;
+	if (opt_block) {
+	  blocks = opt_block.getDescendants();
+	} else {
+	  blocks = Blockly.mainWorkspace.getAllBlocks();
+	}
+	
+	Blockly.RobotC.constants = Object.create(null);
+	// Iterate through every block and add each variable to the hash.
+	for (var x = 0; x < blocks.length; x++) {
+	  var func = blocks[x].getConstants;
+	  if (func) {
+	    var blockConstants = func.call(blocks[x]);
+	    for (var y = 0; y < blockConstants.length; y++) {
+	      var varName = blockConstants[y];
+	      // Variable name may be null if the block is only half-built.
+	      if (varName) {
+	        Blockly.RobotC.constants[varName[0]] = varName[1];
+	      }
+	    }
+	  }
+	}
+	
+	return Blockly.RobotC.constants;
+};
+
+Blockly.RobotC.getConstantNames = function() {
+	  var constantList = [];
+	  for (var name in Blockly.RobotC.constants) {
+	    constantList.push(name);
+	  }
+	  return constantList;
 };
 
 //Blockly.Blocks['variables_globalvars'] = {
