@@ -17,7 +17,7 @@ Blockly.Blocks['set_motor'] = {
 			this.appendValueInput("MOTOR")
 				.setCheck("Motor")
 				.setAlign(Blockly.ALIGN_RIGHT)
-				.appendField("set");
+				.appendField("set motor");
 			this.appendValueInput("POWER")
 				.setCheck("Number")
 				.setAlign(Blockly.ALIGN_RIGHT)
@@ -43,7 +43,6 @@ Blockly.Blocks['motor_constant'] = {
 			this.setHelpUrl('http://www.example.com/');
 			this.setColour(MOTOR_COLOR);
 			this.appendDummyInput()
-				.appendField("motor")
 				.appendField(new Blockly.FieldDropdown([["wrist 1", "wrist1"], ["wrist 2", "wrist2"], ["tail winch", "tailwinch"], ["main winch", "hookwinch"], ["arm motor", "arms"], ["ramp deploy stick", "stick"], ["front left drive", "FL"], ["back left drive", "BL"], ["front right drive", "FR"], ["back right drive", "BR"]]), "MOTOR");
 			this.setOutput(true, "Motor");
 			this.setTooltip('');
