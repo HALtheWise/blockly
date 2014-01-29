@@ -33,29 +33,28 @@ Blockly.Blocks['cblocks_constants_get'] = {
 		this.setHelpUrl(Blockly.Msg.VARIABLES_GET_HELPURL);
 		this.setColour(330);
 		this.appendDummyInput()
-				.appendField(Blockly.Msg.VARIABLES_GET_TITLE)
-				.appendField(new Blockly.FieldVariable(' ', null, false), 'VAR')
-				.appendField(Blockly.Msg.VARIABLES_GET_TAIL);
+				.appendField('get constant')
+				.appendField(new Blockly.FieldDropdown(this.getDropdown), 'VAR');
 		this.setOutput(true);
-		this.setTooltip(Blockly.Msg.VARIABLES_GET_TOOLTIP);
-		this.contextMenuMsg_ = Blockly.Msg.VARIABLES_GET_CREATE_SET;
+		this.setTooltip('Get a #defined constant');
 		this.contextMenuType_ = 'variables_set';
 	},
-	renameVar: function(oldName, newName) {
+	getDropdown: function(){
+		var constList = Blockly.RobotC.getConstantNames();
+		var result = [['','']];
+		for (var x in constList){
+			result.push([constList[x], constList[x]]);
+		}
+		return result;
+	},
+	/**
+	 * Nothing calls this function.
+	 * TODO: Add better support for renaming functions
+	 */
+	renameConst: function(oldName, newName) {
 		if (Blockly.Names.equals(oldName, this.getFieldValue('VAR'))) {
 			this.setFieldValue(newName, 'VAR');
 		}
-	},
-	customContextMenu: function(options) {
-		var option = {enabled: true};
-		var name = this.getFieldValue('VAR');
-		option.text = this.contextMenuMsg_.replace('%1', name);
-		var xmlField = goog.dom.createDom('field', null, name);
-		xmlField.setAttribute('name', 'VAR');
-		var xmlBlock = goog.dom.createDom('block', null, xmlField);
-		xmlBlock.setAttribute('type', this.contextMenuType_);
-		option.callback = Blockly.ContextMenu.callbackFactory(this, xmlBlock);
-		options.push(option);
 	}
 };
 
@@ -71,17 +70,12 @@ Blockly.Blocks['cblocks_constants_declare'] = {
 		this.setInputsInline(true);
 		this.setPreviousStatement(true);
 		this.setNextStatement(true);
-		this.setTooltip('');
+		this.setTooltip('#define a constant.\nCareful renaming an already-existing contant.');
 		Blockly.RobotC.discoverConstants();
 	},
 	getConstants: function() {
 		//Has different name from getVars so the variable will not be double counted
 		return [[this.getFieldValue('NAME'), this]];
-		return {
-			type: this.getFieldValue('TYPE'),
-			name: this.getFieldValue('NAME'),
-			isArray: 'FALSE',
-		};
 	},
 	validator: function(newVar) {
 		// Merge runs of whitespace.  Strip leading and trailing whitespace.
@@ -89,6 +83,10 @@ Blockly.Blocks['cblocks_constants_declare'] = {
 		newVar = newVar.split(' ').join('_').toUpperCase();
 		setTimeout(Blockly.RobotC.discoverConstants,0);
 		return newVar || null;
+	},
+	thisBlock: this,
+	toCode: function(language){
+		return '#define 'this.getFieldValue('NAME') + ' ' + language.valueToCode(thisBlock, 'VALUE');
 	}
 };
 
