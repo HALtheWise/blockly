@@ -68,8 +68,6 @@ Blockly.Blocks['cblocks_constants_declare'] = {
 				.appendField('Value:');
 		this.appendValueInput('VALUE');
 		this.setInputsInline(true);
-		this.setPreviousStatement(true);
-		this.setNextStatement(true);
 		this.setTooltip('#define a constant.\nCareful renaming an already-existing contant.');
 		Blockly.RobotC.discoverConstants();
 	},

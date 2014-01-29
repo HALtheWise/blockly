@@ -39,7 +39,7 @@ Blockly.RobotC['cblocks_constants_declare'] = function(block) {
 	  if (typeof(Blockly.RobotC.definitions_['constants']) == 'undefined'){
 		  Blockly.RobotC.definitions_['constants'] = "";
 	  }
-	  var argument0 = Blockly.RobotC.valueToCode(thisBlock, 'VALUE', Blockly.RobotC.ORDER_COMMA) || '0';
+	  var argument0 = Blockly.RobotC.valueToCode(block, 'VALUE', Blockly.RobotC.ORDER_COMMA) || '0';
 	  var code = '#define ' + block.getFieldValue('NAME') + ' ' + argument0;
 	  Blockly.RobotC.definitions_['constants'] += code;
 	  return '';
