@@ -80,7 +80,6 @@ Blockly.Blocks['task_main'] = {
 				.appendField("when program starts:");
 			this.appendStatementInput("STACK");
 			this.setTooltip('Execution of the RobotC program begins here');
-			this.setDeletable(false);
 		}
 };
 
