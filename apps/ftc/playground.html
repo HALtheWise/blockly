@@ -67,6 +67,9 @@ function start() {
     var toolbox = document.getElementById('toolbox');
     Blockly.inject(document.getElementById('blocklyDiv'),
             {rtl: rtl, path: '../../', toolbox: toolbox});
+	
+	var xml = Blockly.Xml.textToDom('<xml><block type="task_main" id="5" x="1" y="112"></block></xml>');
+	Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
   };
 
   // Set up realtime collaboration.
@@ -306,12 +309,14 @@ h1 {
       <block type="cblocks_constants_declare"></block>
     </category>
 	<category name="NXT">
-	<block type="set_motor" id="3" inline="true" x="101" y="182">
-		<value name="MOTOR">
-		  <block type="motor_constant">
-		  </block>
-		</value>
-	  </block>
+		<block type="set_motor" id="3" inline="true" x="101" y="182">
+			<value name="MOTOR">
+				<block type="motor_constant">
+				</block>
+			</value>
+		</block>
+	    <block type="wait_for_start"></block>
+	    <block type="task_main"></block>
 	</category>
     <category name="Variables" custom="VARIABLE"></category>
     <category name="Functions" custom="PROCEDURE"></category>

@@ -54,3 +54,38 @@ Blockly.RobotC['motor_constant'] = function(block) {
 	var code = dropdown_motor;
 	return [code, Blockly.RobotC.ORDER_ATOMIC];
 };
+
+Blockly.Blocks['wait_for_start'] = {
+		init: function() {
+			this.setHelpUrl('http://www.example.com/');
+			this.setColour(180);
+			this.appendDummyInput()
+				.appendField("waitForStart()");
+			this.setPreviousStatement(true);
+			this.setNextStatement(true);
+			this.setTooltip('Hangs the program until the FTC round begins.');
+		}
+};
+
+Blockly.RobotC['wait_for_start'] = function(block) {
+	var code = 'waitForStart();';
+	return code;
+};
+
+Blockly.Blocks['task_main'] = {
+		  init: function() {
+		    this.setHelpUrl('http://www.example.com/');
+		    this.setColour(180);
+		    this.appendDummyInput()
+		        .appendField("when program starts:");
+		    this.appendStatementInput("STACK");
+		    this.setTooltip('Execution of the RobotC program begins here');
+		    this.setDeletable(false);
+		  }
+		};
+
+Blockly.RobotC['task_main'] = function(block) {
+	  var statements_stack = Blockly.RobotC.statementToCode(block, 'STACK');
+	  var code = 'task main(){\n' + statements_stack + '}';
+	  return code;
+	};
