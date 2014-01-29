@@ -49,6 +49,7 @@
 <script type="text/javascript" src="../../blocks/cblocks/constants.js"></script>
 <script type="text/javascript" src="../../generators/robotc/cblocks/case.js"></script>
 <script type="text/javascript" src="../../generators/robotc/cblocks/constants.js"></script>
+<script type="text/javascript" src="robotcblocks.js"></script>
 <!-- Load the Google Drive SDK Realtime libraries. -->
 <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
 <!-- Load the generic Realtime utility library. -->
@@ -258,7 +259,7 @@ h1 {
       <block type="text_print"></block>
       <block type="text_prompt"></block>
     </category>-->
-    <category name="Lists">
+    <!--<category name="Lists">
       <block type="lists_create_empty"></block>
       <block type="lists_create_with"></block>
       <block type="lists_repeat">
@@ -298,17 +299,16 @@ h1 {
           </block>
         </value>
       </block>
-    </category>
-    <category name="Typed Variables">
-      <block type="variables_get"></block>
-      <block type="variables_set"></block>
-      <block type="variables_declare"></block>
-    </category>
+    </category>-->
     <category name="C Blocks">
       <block type="cblocks_case"></block>
       <block type="cblocks_constants_get"></block>
       <block type="cblocks_constants_declare"></block>
     </category>
+	<category name="NXT">
+      <block type="set_motor"></block>
+      <block type="motor_constant"></block>
+	</category>
     <category name="Variables" custom="VARIABLE"></category>
     <category name="Functions" custom="PROCEDURE"></category>
   </xml>
