@@ -309,9 +309,14 @@ h1 {
       <block type="cblocks_constants_declare"></block>
     </category>
 	<category name="NXT">
-		<block type="set_motor" id="3" inline="true" x="101" y="182">
+		<block type="set_motor">
 			<value name="MOTOR">
 				<block type="motor_constant">
+				</block>
+			</value>
+			<value name="POWER">
+				<block type="math_number">
+					<field name="NUM">0</field>
 				</block>
 			</value>
 		</block>
