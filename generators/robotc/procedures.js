@@ -41,10 +41,17 @@ Blockly.RobotC['procedures_defreturn'] = function(block) {
 	if (returnValue) {
 		returnValue = '  return ' + returnValue + ';\n';
 	}
-	var code = type + ' ' + funcName + block.getArgString(true) + ' {\n' +
+
+	  var args = [];
+	  for (var x = 0; x < block.arguments_.length; x++) {
+	    args[x] = Blockly.RobotC.variableDB_.getName(block.arguments_[x],
+	        Blockly.Variables.NAME_TYPE);
+	  }
+	  
+	var code = type + ' ' + funcName + '(' + args.join(', ') + ') {\n' +
 			branch + returnValue + '}';
 	code = Blockly.RobotC.scrub_(block, code);
-	Blockly.RobotC.definitions_[funcName] = code;
+	Blockly.RobotC.definitions_['function_' + funcName] = code;
 	return null;
 };
 
@@ -60,16 +67,6 @@ Blockly.RobotC['procedures_definit'] = function(block) {
 			branch + '}';
 	code = Blockly.RobotC.scrub_(block, code);
 	Blockly.RobotC.definitions_['init'] = code;
-	return null;
-};
-
-Blockly.RobotC['procedures_defloop'] = function(block) {
-	// Define a procedure with a return value.
-	var branch = Blockly.RobotC.statementToCode(block, 'STACK');
-	var code = 'void loop() {\n' +
-			branch + '}';
-	code = Blockly.RobotC.scrub_(block, code);
-	Blockly.RobotC.definitions_['loop'] = code;
 	return null;
 };
 
