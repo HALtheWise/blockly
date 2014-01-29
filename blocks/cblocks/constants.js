@@ -83,10 +83,6 @@ Blockly.Blocks['cblocks_constants_declare'] = {
 		newVar = newVar.split(' ').join('_').toUpperCase();
 		setTimeout(Blockly.RobotC.discoverConstants,0);
 		return newVar || null;
-	},
-	thisBlock: this,
-	toCode: function(language){
-		return '#define ' + this.getFieldValue('NAME') + ' ' + language.valueToCode(thisBlock, 'VALUE');
 	}
 };
 
