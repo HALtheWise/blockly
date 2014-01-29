@@ -86,7 +86,7 @@ Blockly.Blocks['cblocks_constants_declare'] = {
 	},
 	thisBlock: this,
 	toCode: function(language){
-		return '#define 'this.getFieldValue('NAME') + ' ' + language.valueToCode(thisBlock, 'VALUE');
+		return '#define ' + this.getFieldValue('NAME') + ' ' + language.valueToCode(thisBlock, 'VALUE');
 	}
 };
 
