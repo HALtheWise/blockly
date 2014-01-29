@@ -34,7 +34,7 @@ Blockly.Blocks['set_motor'] = {
 Blockly.RobotC['set_motor'] = function(block) {
 	var value_motor = Blockly.RobotC.valueToCode(block, 'MOTOR', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
 	var value_power = Blockly.RobotC.valueToCode(block, 'POWER', Blockly.JavaScript.ORDER_ATOMIC) || '0';
-	var code = 'motor['+value_motor+'] = ' + value_power + ';';
+	var code = 'motor['+value_motor+'] = ' + value_power + ';\n';
 	return code;
 };
 
