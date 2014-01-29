@@ -147,8 +147,16 @@ Blockly.RobotC.init = function() {
 Blockly.RobotC.finish = function(code) {
 	// Convert the definitions dictionary into a list.
 	var definitions = [];
+	var mustBeFirst = ['constants', 'variables'];
+	for (var name in mustBeFirst){
+		if (name in RobotC.Blockly.definitions_){
+			definitions.push(Blockly.RobotC.definitions_[name]);
+		}
+	}
 	for (var name in Blockly.RobotC.definitions_) {
-		definitions.push(Blockly.RobotC.definitions_[name]);
+		if (!(name in mustBeFirst)){
+			definitions.push(Blockly.RobotC.definitions_[name]);
+		}
 	}
 	return definitions.join('\n\n') + '\n\n\n' + code;
 };
