@@ -63,12 +63,12 @@ Blockly.Blocks['cblocks_constants_declare'] = {
 		// Global #define declaration
 		this.setColour(330);
 		this.appendDummyInput()
-				.appendField('name:')
-				.appendField(new Blockly.FieldTextInput('myVariable', this.validator), 'NAME')
-				.appendField('Value:');
+				.appendField('constant ')
+				.appendField(new Blockly.FieldTextInput('MY_CONSTANT', this.validator), 'NAME')
+				.appendField('=');
 		this.appendValueInput('VALUE');
 		this.setInputsInline(true);
-		this.setTooltip('#define a constant.\nCareful renaming an already-existing contant.');
+		this.setTooltip('#define a constant.\nBe careful renaming an already-existing constant.');
 		Blockly.RobotC.discoverConstants();
 	},
 	getConstants: function() {
