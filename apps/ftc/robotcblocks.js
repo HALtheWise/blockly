@@ -73,19 +73,62 @@ Blockly.RobotC['wait_for_start'] = function(block) {
 };
 
 Blockly.Blocks['task_main'] = {
+		init: function() {
+			this.setHelpUrl('http://www.example.com/');
+			this.setColour(180);
+			this.appendDummyInput()
+				.appendField("when program starts:");
+			this.appendStatementInput("STACK");
+			this.setTooltip('Execution of the RobotC program begins here');
+			this.setDeletable(false);
+		}
+};
+
+Blockly.RobotC['task_main'] = function(block) {
+	var statements_stack = Blockly.RobotC.statementToCode(block, 'STACK');
+	var code = 'task main(){\n' + statements_stack + '}';
+	return code;
+};
+
+Blockly.Blocks['get_joy_value'] = {
+		init: function() {
+			this.setHelpUrl('http://www.example.com/');
+			this.setColour(230);
+			this.appendDummyInput()
+				.appendField(new Blockly.FieldDropdown([["main joystick", "joy1"], ["auxilary joystick", "joy2"]]), "CONTROLLER")
+				.appendField(new Blockly.FieldDropdown([["left stick", "1"], ["right stick", "2"]]), "STICK")
+				.appendField(new Blockly.FieldDropdown([["X axis", "x"], ["Y axis", "y"]]), "AXIS");
+			this.setInputsInline(true);
+			this.setOutput(true, "Number");
+			this.setTooltip('Retrieves an axis value from the joystick');
+		}
+};
+
+Blockly.RobotC['get_joy_value'] = function(block) {
+	var dropdown_controller = block.getFieldValue('CONTROLLER');
+	var dropdown_stick = block.getFieldValue('STICK');
+	var dropdown_axis = block.getFieldValue('AXIS');
+	var code = 'joystick.' + dropdown_controller + dropdown_axis + dropdown_stick;
+	return [code, Blockly.RobotC.ORDER_MEMBER];
+};
+
+Blockly.Blocks['get_joy_button'] = {
 		  init: function() {
 		    this.setHelpUrl('http://www.example.com/');
-		    this.setColour(180);
-		    this.appendDummyInput()
-		        .appendField("when program starts:");
-		    this.appendStatementInput("STACK");
-		    this.setTooltip('Execution of the RobotC program begins here');
-		    this.setDeletable(false);
+		    this.setColour(230);
+		    this.appendValueInput("BUTTON")
+		        .setCheck("Number")
+		        .appendField(new Blockly.FieldDropdown([["main joystick", "1"], ["auxilary joystick", "2"]]), "CONTROLLER")
+		        .appendField("button");
+		    this.setInputsInline(true);
+		    this.setOutput(true);
+		    this.setTooltip('Retrieves the pressed state of a button on a controller');
 		  }
 		};
 
-Blockly.RobotC['task_main'] = function(block) {
-	  var statements_stack = Blockly.RobotC.statementToCode(block, 'STACK');
-	  var code = 'task main(){\n' + statements_stack + '}';
-	  return code;
+Blockly.RobotC['get_joy_button'] = function(block) {
+	  var value_button = Blockly.RobotC.valueToCode(block, 'BUTTON', Blockly.JavaScript.ORDER_ATOMIC);
+	  var dropdown_controller = block.getFieldValue('CONTROLLER');
+	  var code = 'joy' + dropdown_controller + 'Btn(' + value_button + ')';
+	  return [code, Blockly.RobotC.ORDER_FUNCTION_CALL];
 	};
