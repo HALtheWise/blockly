@@ -40,7 +40,7 @@ Blockly.RobotC['cblocks_constants_declare'] = function(block) {
 		  Blockly.RobotC.definitions_['constants'] = "";
 	  }
 	  var argument0 = Blockly.RobotC.valueToCode(block, 'VALUE', Blockly.RobotC.ORDER_COMMA) || '0';
-	  var code = '#define ' + block.getFieldValue('NAME') + ' ' + argument0;
+	  var code = '#define ' + block.getFieldValue('NAME') + ' ' + argument0 + '\n';
 	  Blockly.RobotC.definitions_['constants'] += code;
 	  return '';
 };
