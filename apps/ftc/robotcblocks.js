@@ -32,8 +32,8 @@ Blockly.Blocks['set_motor'] = {
 };
 
 Blockly.RobotC['set_motor'] = function(block) {
-	var value_motor = Blockly.RobotC.valueToCode(block, 'MOTOR', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
-	var value_power = Blockly.RobotC.valueToCode(block, 'POWER', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+	var value_motor = Blockly.RobotC.valueToCode(block, 'MOTOR', Blockly.RobotC.ORDER_ATOMIC) || 'null';
+	var value_power = Blockly.RobotC.valueToCode(block, 'POWER', Blockly.RobotC.ORDER_ATOMIC) || '0';
 	var code = 'motor['+value_motor+'] = ' + value_power + ';\n';
 	return code;
 };
@@ -126,7 +126,7 @@ Blockly.Blocks['get_joy_button'] = {
 		};
 
 Blockly.RobotC['get_joy_button'] = function(block) {
-	  var value_button = Blockly.RobotC.valueToCode(block, 'BUTTON', Blockly.JavaScript.ORDER_ATOMIC);
+	  var value_button = Blockly.RobotC.valueToCode(block, 'BUTTON', Blockly.RobotC.ORDER_ATOMIC);
 	  var dropdown_controller = block.getFieldValue('CONTROLLER');
 	  var code = 'joy' + dropdown_controller + 'Btn(' + value_button + ')';
 	  return [code, Blockly.RobotC.ORDER_FUNCTION_CALL];

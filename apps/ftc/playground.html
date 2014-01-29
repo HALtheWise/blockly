@@ -75,15 +75,15 @@ function start() {
   // Set up realtime collaboration.
   // If you want to use the realtime collaboration features then uncomment out
   // the next 2 lines and comment out the call to startUi() below.
-//  document.getElementById("realtime").style.display = "block";
-//  Blockly.Realtime.startRealtime(startUi);
+  document.getElementById("realtime").style.display = "block";
+  Blockly.Realtime.startRealtime(startUi);
 
   // If you don't want to use the realtime collaboration features then uncomment
   // out the next line and comment out the call to
   // Blockly.Realtime.startRealtime() above it.  You can also comment out
   // (or delete) the loading of the realtime related libraries up above in this
   // case, if you want.
-  startUi();
+  //startUi();
 }
 
 function toXml() {
