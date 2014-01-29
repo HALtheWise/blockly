@@ -17,7 +17,7 @@ Blockly.Blocks['set_motor'] = {
 			this.appendValueInput("MOTOR")
 				.setCheck("Motor")
 				.setAlign(Blockly.ALIGN_RIGHT)
-				.appendField("set motor");
+				.appendField("set");
 			this.appendValueInput("POWER")
 				.setCheck("Number")
 				.setAlign(Blockly.ALIGN_RIGHT)
