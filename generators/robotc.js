@@ -149,12 +149,12 @@ Blockly.RobotC.finish = function(code) {
 	var definitions = [];
 	var mustBeFirst = ['constants', 'variables'];
 	for (var name in mustBeFirst){
-		if (name in RobotC.Blockly.definitions_){
-			definitions.push(Blockly.RobotC.definitions_[name]);
+		if (mustBeFirst[name] in Blockly.RobotC.definitions_){
+			definitions.push(Blockly.RobotC.definitions_[mustBeFirst[name]]);
 		}
 	}
 	for (var name in Blockly.RobotC.definitions_) {
-		if (!(name in mustBeFirst)){
+		if (mustBeFirst.indexOf(name) < 0){
 			definitions.push(Blockly.RobotC.definitions_[name]);
 		}
 	}
