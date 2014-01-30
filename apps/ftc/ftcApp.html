@@ -77,7 +77,6 @@ function toCode(lang) {
 function previewCode() {
   var output = document.getElementById('codeExport');
   output.innerHTML = '<pre>' + Blockly.RobotC.workspaceToCode() + '</pre>';
-  console.log(output.innerHTML);
 }
 
 </script>
@@ -98,20 +97,23 @@ h1 {
 #blocklyDiv {
   float: left;
   height: 95%;
-  width: 95%;
+  width: 70%;
 }
 #codeExport {
 	width: 27%;
-	height: 50%;
+	height: 95%;
 	float: right;
+	overflow: scroll;
 }
 </style>
 </head>
 <body onload="start()">
 
-  <div id="blocklyDiv" style="width: 70%"></div>
+  <div id="blocklyDiv"></div>
 
   <div id="codeExport"></div>
+
+  <h1>FTC 6987 Code Generator</h1>
   
   <xml id="toolbox" style="display: none">
     <category name="Logic">
@@ -299,8 +301,6 @@ h1 {
     <category name="Functions" custom="PROCEDURE"></category>
   </xml>
 
-  <h1>Blockly Playground</h1>
-
   <p>
     <input type="button" value="Export to XML" onclick="toXml()">
     &nbsp;
@@ -308,7 +308,7 @@ h1 {
     <br>
     <input type="button" value="To RobotC" onclick="toCode('RobotC')">
     <br>
-    <textarea id="importExport" style="width: 26%; height: 12em"></textarea>
+    <textarea id="importExport" style="width: 29%; height: 12em"></textarea>
   </p>
   <hr>
 

@@ -72,6 +72,23 @@ Blockly.RobotC['wait_for_start'] = function(block) {
 	return code;
 };
 
+Blockly.Blocks['get_joysticks'] = {
+		init: function() {
+			this.setHelpUrl('http://www.example.com/');
+			this.setColour(180);
+			this.appendDummyInput()
+				.appendField("get joystick information");
+			this.setPreviousStatement(true);
+			this.setNextStatement(true);
+			this.setTooltip('Retrieves the joystick control information from the FCS.');
+		}
+};
+
+Blockly.RobotC['get_joysticks'] = function(block) {
+	var code = 'getJoystickSettings(joystick);\n';
+	return code;
+};
+
 Blockly.Blocks['task_main'] = {
 		init: function() {
 			this.setHelpUrl('http://www.example.com/');
