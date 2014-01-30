@@ -68,7 +68,7 @@ Blockly.Blocks['wait_for_start'] = {
 };
 
 Blockly.RobotC['wait_for_start'] = function(block) {
-	var code = 'waitForStart();';
+	var code = 'waitForStart();\n';
 	return code;
 };
 
