@@ -21,15 +21,16 @@
 /*data = [
         'void noReturnFunction(){ //Tooltip for the function.',
         'float returnsNumber(int arg1, int arg2)  //Another tooltip.'
-        ];
+        ];*/
 
 typeMap = {
 		'float' : 'Number',
-		'int' : 'Number',
-		'long' : 'Number',
-		'bool' : 'Boolean',
+		'int' 	: 'Number',
+		'long' 	: 'Number',
+		'bool' 	: 'Boolean',
+		'motor'	: 'Motor',
 		'void'	: null
-};*/
+};
 
 
 Blockly.RobotC.parseC = function(colour, inputString){
@@ -121,5 +122,11 @@ Blockly.RobotC.generateSimpleBlock = function(block){
 			return [code, Blockly.RobotC.ORDER_FUNCTION_CALL];
 		}
 		return code;
+	};
+	
+	Blockly.RobotC.generateBlocks = function(colour, blist){
+		for (i in blist){
+			Blockly.RobotC.generateSimpleBlocks(Blockly.RobotC.parseC(colour, blist[i]));
+		}
 	};
 };
