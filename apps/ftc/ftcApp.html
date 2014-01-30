@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>FTC 6987 RobotC Graphical Visualization</title>
+<script type="text/javascript" src="../../blockly_compressed.js"></script>
+<script type="text/javascript" src="../../generators/robotc.js"></script>
+<script type="text/javascript" src="../../generators/robotc/logic.js"></script>
+<script type="text/javascript" src="../../generators/robotc/loops.js"></script>
+<script type="text/javascript" src="../../generators/robotc/math.js"></script>
+<script type="text/javascript" src="../../generators/robotc/text.js"></script>
+<script type="text/javascript" src="../../generators/robotc/variables.js"></script>
+<script type="text/javascript" src="../../generators/robotc/procedures.js"></script>
+<script type="text/javascript" src="../../msg/messages.js"></script>
+<script type="text/javascript" src="../../blocks_compressed.js"></script>
+<script type="text/javascript" src="../../blocks/cblocks/case.js"></script>
+<script type="text/javascript" src="../../blocks/cblocks/constants.js"></script>
+<script type="text/javascript" src="../../generators/robotc/cblocks/case.js"></script>
+<script type="text/javascript" src="../../generators/robotc/cblocks/constants.js"></script>
+<script type="text/javascript" src="robotcblocks.js"></script>
+<!-- Load the Google Drive SDK Realtime libraries. -->
+<script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
+<!-- Load the generic Realtime utility library. -->
+<script type="text/javascript" src="../../realtime/realtime-client-utils.js"></script>
+<!-- Load the Blockly apps realtime library. -->
+<!--<script type="text/javascript" src="../../realtime/realtime.js"></script>-->
+<script type="text/javascript">
+'use strict';
+// Depending on the URL argument, render as LTR or RTL.
+var rtl = (document.location.search == '?rtl');
+var block = null;
+
+function start() {
+  var startUi = function () {
+    var toolbox = document.getElementById('toolbox');
+    Blockly.inject(document.getElementById('blocklyDiv'),
+            {rtl: rtl, path: '../../', toolbox: toolbox});
+	
+	var xml = Blockly.Xml.textToDom('<xml><block type="task_main" id="5" x="1" y="112"></block></xml>');
+	Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+  };
+
+  // Set up realtime collaboration.
+  // If you want to use the realtime collaboration features then uncomment out
+  // the next 2 lines and comment out the call to startUi() below.
+  //document.getElementById("realtime").style.display = "block";
+  //Blockly.Realtime.startRealtime(startUi);
+
+  // If you don't want to use the realtime collaboration features then uncomment
+  // out the next line and comment out the call to
+  // Blockly.Realtime.startRealtime() above it.  You can also comment out
+  // (or delete) the loading of the realtime related libraries up above in this
+  // case, if you want.
+  startUi();
+  Blockly.addChangeListener(previewCode);
+}
+
+function toXml() {
+  var output = document.getElementById('importExport');
+  var xml = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+  output.value = Blockly.Xml.domToPrettyText(xml);
+  output.focus();
+  output.select();
+}
+
+function fromXml() {
+  var input = document.getElementById('importExport');
+  var xml = Blockly.Xml.textToDom(input.value);
+  Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+}
+
+function toCode(lang) {
+  var output = document.getElementById('importExport');
+  output.value = Blockly[lang].workspaceToCode();
+}
+
+function previewCode() {
+  var output = document.getElementById('codeExport');
+  output.innerHTML = '<pre>' + Blockly.RobotC.workspaceToCode() + '</pre>';
+  console.log(output.innerHTML);
+}
+
+</script>
+
+<style>
+html, body {
+  height: 100%;
+}
+body {
+  background-color: #fff;
+  font-family: sans-serif;
+  overflow: hidden;
+}
+h1 {
+  font-weight: normal;
+  font-size: 140%;
+}
+#blocklyDiv {
+  float: left;
+  height: 95%;
+  width: 95%;
+}
+#codeExport {
+	width: 27%;
+	height: 50%;
+	float: right;
+}
+</style>
+</head>
+<body onload="start()">
+
+  <div id="blocklyDiv" style="width: 70%"></div>
+
+  <div id="codeExport"></div>
+  
+  <xml id="toolbox" style="display: none">
+    <category name="Logic">
+      <block type="controls_if"></block>
+      <block type="logic_compare"></block>
+      <block type="logic_operation"></block>
+      <block type="logic_negate"></block>
+      <block type="logic_boolean"></block>
+      <block type="logic_ternary"></block>
+    </category>
+    <category name="Loops">
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+      </block>
+      <block type="controls_whileUntil"></block>
+      <block type="controls_for">
+        <value name="FROM">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="TO">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+        <value name="BY">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+      </block>
+      <block type="controls_flow_statements"></block>
+    </category>
+    <category name="Math">
+      <block type="math_number"></block>
+      <block type="math_arithmetic"></block>
+      <block type="math_single"></block>
+      <block type="math_trig"></block>
+      <block type="math_constant"></block>
+      <block type="math_change">
+        <value name="DELTA">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+      </block>
+      <block type="math_round"></block>
+      <block type="math_modulo"></block>
+      <block type="math_constrain">
+        <value name="LOW">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="HIGH">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+      </block>
+	  <!--<block type="math_random_int">
+        <value name="FROM">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="TO">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+      </block>
+      <block type="math_random_float"></block>-->
+    </category>
+    <!--<category name="Text">
+      <block type="text"></block>
+      <block type="text_join"></block>
+      <block type="text_append">
+        <value name="TEXT">
+          <block type="text"></block>
+        </value>
+      </block>
+      <block type="text_length"></block>
+      <block type="text_isEmpty"></block>
+      <block type="text_indexOf">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">text</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_charAt">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">text</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_getSubstring">
+        <value name="STRING">
+          <block type="variables_get">
+            <field name="VAR">text</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_changeCase"></block>
+      <block type="text_trim"></block>
+      <block type="text_print"></block>
+      <block type="text_prompt"></block>
+    </category>-->
+    <!--<category name="Lists">
+      <block type="lists_create_empty"></block>
+      <block type="lists_create_with"></block>
+      <block type="lists_repeat">
+        <value name="NUM">
+          <block type="math_number">
+            <field name="NUM">5</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_length"></block>
+      <block type="lists_isEmpty"></block>
+      <block type="lists_indexOf">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_getIndex">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_setIndex">
+        <value name="LIST">
+          <block type="variables_get">
+            <field name="VAR">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_getSublist">
+        <value name="LIST">
+          <block type="variables_get">
+            <field name="VAR">list</field>
+          </block>
+        </value>
+      </block>
+    </category>-->
+    <category name="C Blocks">
+      <block type="cblocks_case"></block>
+      <block type="cblocks_constants_get"></block>
+      <block type="cblocks_constants_declare"></block>
+    </category>
+	<category name="NXT">
+		<block type="set_motor">
+			<value name="MOTOR">
+				<block type="motor_constant">
+				</block>
+			</value>
+			<value name="POWER">
+				<block type="math_number">
+					<field name="NUM">0</field>
+				</block>
+			</value>
+		</block>
+	    <block type="wait_for_start"></block>
+	    <block type="get_joy_value"></block>
+	    <block type="get_joy_button">
+            <value name="BUTTON">
+              <block type="math_number">
+                <field name="NUM">1</field>
+              </block>
+            </value>
+          </block>
+	</category>
+    <category name="Variables" custom="VARIABLE"></category>
+    <category name="Functions" custom="PROCEDURE"></category>
+  </xml>
+
+  <h1>Blockly Playground</h1>
+
+  <p>
+    <input type="button" value="Export to XML" onclick="toXml()">
+    &nbsp;
+    <input type="button" value="Import from XML" onclick="fromXml()">
+    <br>
+    <input type="button" value="To RobotC" onclick="toCode('RobotC')">
+    <br>
+    <textarea id="importExport" style="width: 26%; height: 12em"></textarea>
+  </p>
+  <hr>
+
+  <!-- Realtime setup buttons. -->
+
+  <div id="realtime" style="display: none">
+
+    <p>Test realtime collaboration by opening
+      <a target="_blank" href="#" onmouseover="this.href = window.location.href">this link in a separate
+        browser window or tab</a> and they will be synchronized.  If this is the first time you've used
+      realtime collaboration with Blockly you'll need to authorize using the following button if it is enabled.</p>
+
+    <button id="authorizeButton">You must authorize</button>
+
+    <br>
+    <br>
+
+    <!-- Undo and redo buttons. -->
+    <!--
+      <button id="undoButton" disabled>Undo</button>
+      <button id="redoButton" disabled>Redo</button>
+      <br />
+    -->
+
+    <!-- Text area that will be used for our collaborative chat box. -->
+    <textarea id="chatbox" style="width: 26%; height: 12em" disabled="true"></textarea>
+
+  </div>
+</body>
+</html>
