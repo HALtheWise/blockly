@@ -18,6 +18,7 @@
 <script type="text/javascript" src="../../generators/robotc/cblocks/case.js"></script>
 <script type="text/javascript" src="../../generators/robotc/cblocks/constants.js"></script>
 <script type="text/javascript" src="robotcblocks.js"></script>
+<script type="text/javascript" src="storage.js"></script>
 <!-- Load the Google Drive SDK Realtime libraries. -->
 <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
 <!-- Load the generic Realtime utility library. -->
@@ -53,6 +54,11 @@ function start() {
   // case, if you want.
   startUi();
   Blockly.addChangeListener(previewCode);
+  
+  BlocklyStorage.LINK_ALERT = 'Share your blocks with this link:\n\n%1';
+  if ('BlocklyStorage' in window && window.location.hash.length > 1) {
+    BlocklyStorage.retrieveXml(window.location.hash.substring(1));
+  }
 }
 
 function toXml() {
@@ -288,6 +294,7 @@ h1 {
 			</value>
 		</block>
 	    <block type="wait_for_start"></block>
+	    <block type="get_joysticks"></block>
 	    <block type="get_joy_value"></block>
 	    <block type="get_joy_button">
             <value name="BUTTON">
@@ -305,10 +312,13 @@ h1 {
     <input type="button" value="Export to XML" onclick="toXml()">
     &nbsp;
     <input type="button" value="Import from XML" onclick="fromXml()">
-    <br>
+    &nbsp;
     <input type="button" value="To RobotC" onclick="toCode('RobotC')">
+    &nbsp;
+    <input type="button" value="Save Program" onclick="BlocklyStorage.link()">
+  
     <br>
-    <textarea id="importExport" style="width: 29%; height: 12em"></textarea>
+    <textarea id="importExport" style="width: 60%; height: 12em"></textarea>
   </p>
   <hr>
 

@@ -35,7 +35,7 @@ Blockly.RobotC['procedures_defreturn'] = function(block) {
 	var funcName = Blockly.RobotC.variableDB_.getName(
 			block.getFieldValue('NAME'), Blockly.Procedures.NAME_TYPE);
 	var branch = Blockly.RobotC.statementToCode(block, 'STACK');
-	var type = block.getFieldValue('TYPE') || 'void';
+	var type = (block.callType_ == 'procedures_callnoreturn') ? 'void' : 'float';
 	var returnValue = Blockly.RobotC.valueToCode(block, 'RETURN',
 			Blockly.RobotC.ORDER_NONE) || '';
 	if (returnValue) {
@@ -44,7 +44,7 @@ Blockly.RobotC['procedures_defreturn'] = function(block) {
 
 	  var args = [];
 	  for (var x = 0; x < block.arguments_.length; x++) {
-	    args[x] = Blockly.RobotC.variableDB_.getName(block.arguments_[x],
+	    args[x] = 'float ' + Blockly.RobotC.variableDB_.getName(block.arguments_[x],
 	        Blockly.Variables.NAME_TYPE);
 	  }
 	  
