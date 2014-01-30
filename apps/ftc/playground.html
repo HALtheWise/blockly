@@ -50,6 +50,7 @@
 <script type="text/javascript" src="../../generators/robotc/cblocks/case.js"></script>
 <script type="text/javascript" src="../../generators/robotc/cblocks/constants.js"></script>
 <script type="text/javascript" src="robotcblocks.js"></script>
+<script type="text/javascript" src="blockgen.js"></script>
 <!-- Load the Google Drive SDK Realtime libraries. -->
 <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
 <!-- Load the generic Realtime utility library. -->
@@ -75,15 +76,15 @@ function start() {
   // Set up realtime collaboration.
   // If you want to use the realtime collaboration features then uncomment out
   // the next 2 lines and comment out the call to startUi() below.
-  document.getElementById("realtime").style.display = "block";
-  Blockly.Realtime.startRealtime(startUi);
+  //document.getElementById("realtime").style.display = "block";
+  //Blockly.Realtime.startRealtime(startUi);
 
   // If you don't want to use the realtime collaboration features then uncomment
   // out the next line and comment out the call to
   // Blockly.Realtime.startRealtime() above it.  You can also comment out
   // (or delete) the loading of the realtime related libraries up above in this
   // case, if you want.
-  //startUi();
+  startUi();
 }
 
 function toXml() {
@@ -156,6 +157,8 @@ h1 {
       <block type="logic_negate"></block>
       <block type="logic_boolean"></block>
       <block type="logic_ternary"></block>
+      <block type="noReturnFunction"></block>
+	  
     </category>
     <category name="Loops">
       <block type="controls_repeat_ext">
