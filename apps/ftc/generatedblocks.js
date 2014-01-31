@@ -12,7 +12,7 @@ NXT.Motors.color = 100;
 NXT.Motors.Simplecode = [
 {
 	name:"motor_speed_control",
-	display_name:"Enable speed control", //defaults to name
+	display_name:"enable speed control", //defaults to name
 	args:[["motor", "Motor"],["speed control", "Boolean"]],
 	tooltip: 'Enables PID speed control for a motor',
 	hue: NXT.Motors.color,
