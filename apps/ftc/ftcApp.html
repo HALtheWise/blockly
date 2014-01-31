@@ -19,6 +19,8 @@
 <script type="text/javascript" src="../../generators/robotc/cblocks/constants.js"></script>
 <script type="text/javascript" src="robotcblocks.js"></script>
 <script type="text/javascript" src="storage.js"></script>
+<script type="text/javascript" src="blockgen.js"></script>
+<script type="text/javascript" src="generatedblocks.js"></script>
 <!-- Load the Google Drive SDK Realtime libraries. -->
 <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
 <!-- Load the generic Realtime utility library. -->
@@ -282,19 +284,27 @@ h1 {
       <block type="cblocks_constants_declare"></block>
     </category>
 	<category name="NXT">
-		<block type="set_motor">
-			<value name="MOTOR">
-				<block type="motor_constant">
-				</block>
-			</value>
-			<value name="POWER">
-				<block type="math_number">
-					<field name="NUM">0</field>
-				</block>
-			</value>
-		</block>
+		<category name="Motors">
+			<block type="set_motor">
+				<value name="MOTOR">
+					<block type="motor_constant">
+					</block>
+				</value>
+				<value name="POWER">
+					<block type="math_number">
+						<field name="NUM">0</field>
+					</block>
+				</value>
+			</block>
+			<block type="motor_constant"></block>
+			<block type="motor_speed_control"></block>
+			<block type="motor_speed_max"></block>
+			<block type="motor_encoder_get"></block>
+			<block type="motor_encoder_reset"></block>
+			<block type="motor_encoder_set_target"></block>
+			<block type="motor_reflect"></block>
+		</category>
 	    <block type="wait_for_start"></block>
-	    <block type="get_joysticks"></block>
 	    <block type="get_joy_value"></block>
 	    <block type="get_joy_button">
             <value name="BUTTON">
