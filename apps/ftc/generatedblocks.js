@@ -6,6 +6,8 @@
 
 //NXT Motor Control
 //http://www.robotc.net/wiki/NXT_Motors_and_Servos_Overview
+NXT = {};
+NXT.Motors = {};
 NXT.Motors.color = 100;
 NXT.Motors.Simplecode = [
 {
@@ -23,15 +25,6 @@ NXT.Motors.Simplecode = [
 	tooltip: 'Sets the maximum encoder clicks per second that PID will attempt to reach.\nDo not set above 750 on low batteries.',
 	hue: NXT.Motors.color,
 	template: 'nMaxRegulatedSpeed = ~0;\n'
-},
-{
-	name:"motor_encoder_get",
-	display_name:"encoder get", //defaults to name
-	args:[["motor", "Motor"]],
-	tooltip: 'Retrieves the encoder value for the specified motor.',
-	returns: 'Number',
-	hue: NXT.Motors.color,
-	template: 'nMotorEncoder[~0]'
 },
 {
 	name:"motor_encoder_get",
@@ -67,3 +60,4 @@ NXT.Motors.Simplecode = [
 	template: 'bMotorReflected[~0] = ~1;\n'
 }
                       ];
+Blockly.RobotC.generateBlocks(NXT.Motors.color, NXT.Motors.Simplecode);

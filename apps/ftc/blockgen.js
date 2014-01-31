@@ -89,10 +89,10 @@ Blockly.RobotC.generateSimpleBlock = function(block){
 				this.setHelpUrl('http://www.example.com/');
 				this.setColour(block.hue);
 				this.appendDummyInput()
-					.appendField(block.humanName || block.name);
-				console.log(block.args);
+					.appendField(block.display_name || block.name);
+
 				for (argnum in (block.args||[])){
-					var arg = args[argnum];
+					var arg = block.args[argnum];
 					this.appendValueInput('INPUT'+argnum)
 						.appendField(arg[0])
 						.setAlign(Blockly.ALIGN_RIGHT)
@@ -102,9 +102,15 @@ Blockly.RobotC.generateSimpleBlock = function(block){
 				if (typeof(block.returns) != 'undefined'){
 					this.setOutput(true, block.returns);
 				}else{
-					this.setPreviousStatement(block.connections == 'Top' || block.connections == 'Both');
-					this.setNextStatement(block.connections == 'Bottom' || block.connections == 'Both');
+					var c = block.connections;
+					this.setPreviousStatement(!c || c == 'Top' || c == 'Both');
+					this.setNextStatement(!c || c == 'Bottom' || c == 'Both');
 				}
+				
+//				if (block.args && block.args.length <= 1){
+//					this.setInputsInline(true);
+//				}
+				
 				this.setTooltip(block.tooltip || '');
 			},
 	};
@@ -122,11 +128,12 @@ Blockly.RobotC.generateSimpleBlock = function(block){
 			return [code, Blockly.RobotC.ORDER_FUNCTION_CALL];
 		}
 		return code;
-	};
-	
-	Blockly.RobotC.generateBlocks = function(colour, blist){
-		for (i in blist){
-			Blockly.RobotC.generateSimpleBlocks(Blockly.RobotC.parseC(colour, blist[i]));
-		}
-	};
+	};	
+};
+
+Blockly.RobotC.generateBlocks = function(colour, blist){
+	console.log('generating blocks');
+	for (i in blist){
+		Blockly.RobotC.generateSimpleBlock(blist[i]);
+	}
 };
