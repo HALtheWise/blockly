@@ -117,6 +117,7 @@ Blockly.RobotC.generateSimpleBlock = function(block){
 	
 	var template = block.template;
 	var returns = typeof(block.returns) != 'undefined';
+	var numArgs = block.args.length || 0;
 	
 	Blockly.RobotC[block.name] = function(block) {
 		var code = template;

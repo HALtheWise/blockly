@@ -70,7 +70,7 @@ function start() {
     Blockly.inject(document.getElementById('blocklyDiv'),
             {rtl: rtl, path: '../../', toolbox: toolbox});
 	
-	var xml = Blockly.Xml.textToDom('<xml><block type="task_main" id="5" x="1" y="112"></block></xml>');
+	var xml = Blockly.Xml.textToDom('<xml><block type="task_main"x="1" y="112"></block></xml>');
 	Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
   };
 
@@ -312,24 +312,43 @@ h1 {
     </category>
 	<category name="NXT">
 		<category name="Motors">
-			<block type="set_motor">
-				<value name="MOTOR">
-					<block type="motor_constant">
-					</block>
-				</value>
-				<value name="POWER">
-					<block type="math_number">
-						<field name="NUM">0</field>
-					</block>
-				</value>
-			</block>
-			<block type="motor_constant"></block>
-			<block type="motor_speed_control"></block>
-			<block type="motor_speed_max"></block>
-			<block type="motor_encoder_get"></block>
-			<block type="motor_encoder_reset"></block>
-			<block type="motor_encoder_set_target"></block>
-			<block type="motor_reflect"></block>
+		  <block type="set_motor">
+			<value name="MOTOR">
+			  <block type="motor_constant" ></block>
+			</value>
+			<value name="POWER">
+			  <block type="math_number">
+				<field name="NUM">0</field>
+			  </block>
+			</value>
+		  </block>
+		  <block type="motor_speed_control">
+			<value name="INPUT0">
+			  <block type="motor_constant"></block>
+			</value>
+		  </block>
+		  <block type="motor_speed_max" ></block>
+		  <block type="motor_encoder_get">
+			<value name="INPUT0">
+			  <block type="motor_constant"></block>
+			</value>
+		  </block>
+		  <block type="motor_encoder_reset">
+			<value name="INPUT0">
+			  <block type="motor_constant"></block>
+			</value>
+		  </block>
+		  <block type="motor_encoder_set_target">
+			<value name="INPUT0">
+			  <block type="motor_constant"></block>
+			</value>
+		  </block>
+		  <block type="motor_reflect">
+			<value name="INPUT0">
+			  <block type="motor_constant"></block>
+			</value>
+		  </block>
+		  <block type="motor_constant" ></block>
 		</category>
 	    <block type="wait_for_start"></block>
 	    <block type="get_joy_value"></block>
