@@ -124,7 +124,7 @@ Blockly.RobotC['get_joy_value'] = function(block) {
 	var dropdown_controller = block.getFieldValue('CONTROLLER');
 	var dropdown_stick = block.getFieldValue('STICK');
 	var dropdown_axis = block.getFieldValue('AXIS');
-	var code = 'joystick.' + dropdown_controller + dropdown_axis + dropdown_stick;
+	var code = 'joystick.' + dropdown_controller + '_' + dropdown_axis + dropdown_stick;
 	return [code, Blockly.RobotC.ORDER_MEMBER];
 };
 
