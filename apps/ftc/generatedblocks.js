@@ -37,7 +37,7 @@ NXT.Motors.Simplecode = [
 },
 {
 	name:"motor_encoder_reset",
-	display_name:"encoder reset", //defaults to name
+	display_name:"reset encoder", //defaults to name
 	args:[["motor", "Motor"]],
 	tooltip: 'Resets the encoder value for the specified motor.',
 	hue: NXT.Motors.color,
