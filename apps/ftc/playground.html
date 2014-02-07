@@ -53,12 +53,13 @@
 <script type="text/javascript" src="blockgen.js"></script>
 <script type="text/javascript" src="motorBlocks.js"></script>
 <script type="text/javascript" src="sensorBlocks.js"></script>
+<script type="text/javascript" src="timingBlocks.js"></script>
 <!-- Load the Google Drive SDK Realtime libraries. -->
 <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
 <!-- Load the generic Realtime utility library. -->
 <script type="text/javascript" src="../../realtime/realtime-client-utils.js"></script>
 <!-- Load the Blockly apps realtime library. -->
-<script type="text/javascript" src="../../realtime/realtime.js"></script>
+<!--<script type="text/javascript" src="../../realtime/realtime.js"></script>-->
 <script type="text/javascript">
 'use strict';
 // Depending on the URL argument, render as LTR or RTL.
@@ -258,6 +259,9 @@ h1 {
 			<value name="INPUT0">
 			  <block type="motor_constant"></block>
 			</value>
+			<value name="INPUT1">
+			  <block type="logic_boolean"></block>
+			</value>
 		  </block>
 		  <block type="motor_constant" ></block>
 		</category>
@@ -273,6 +277,31 @@ h1 {
 			</value>
 		  </block>
 		  <block type="sensor_constant" ></block>
+		</category>
+		<category name="Timing">
+		  <block type="timer_clear">
+			<value name="INPUT0">
+			  <block type="timer_constant"></block>
+			</value>
+		  </block>
+		  <block type="timer_clear">
+			<value name="INPUT0">
+			  <block type="timer_constant"></block>
+			</value>
+		  </block>
+		  <block type="timer_clear">
+			<value name="INPUT0">
+			  <block type="timer_constant"></block>
+			</value>
+		  </block>
+		  <block type="timer_clear">
+			<value name="INPUT0">
+			  <block type="timer_constant"></block>
+			</value>
+		  </block>
+		  <block type="wait_1ms"></block>
+		  <block type="wait_10ms"></block>
+		  <block type="clock_minutes"></block>
 		</category>
 	    <block type="wait_for_start"></block>
 	    <block type="get_joy_value"></block>
