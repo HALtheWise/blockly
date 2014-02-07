@@ -56,7 +56,7 @@ NXT.Timing.Simplecode = [
 	template: 'time10[~0]'
 },
 {
-	name:"timer_get_1ms",
+	name:"timer_get_100ms",
 	display_name:"get 100ms ticks", //defaults to name
 	args:[["", "Timer"]],
 	tooltip: 'Gets number of 100ms increments to pass since timer reset',
