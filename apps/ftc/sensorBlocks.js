@@ -35,16 +35,16 @@ NXT.Sensors.Simplecode = [
 	tooltip: 'Gets value for a given sensor (see RobotC wiki)',
 	hue: NXT.Sensors.color,
 	returns: 'Number',
-	template: 'SensorValue[~0]'
+	template: 'sensorValue[~0]'
 },
 {
-	name:"sensor_value",
+	name:"sensor_raw",
 	display_name:"get raw value", //defaults to name
 	args:[["sensor", "Sensor"]],
 	tooltip: 'Gets raw value for a given sensor (see RobotC wiki)',
 	hue: NXT.Sensors.color,
 	returns: 'Number',
-	template: 'SensorRaw[~0]'
+	template: 'sensorRaw[~0]'
 }
                       ];
 

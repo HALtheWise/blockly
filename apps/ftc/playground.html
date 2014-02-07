@@ -51,7 +51,8 @@
 <script type="text/javascript" src="../../generators/robotc/cblocks/constants.js"></script>
 <script type="text/javascript" src="robotcblocks.js"></script>
 <script type="text/javascript" src="blockgen.js"></script>
-<script type="text/javascript" src="generatedblocks.js"></script>
+<script type="text/javascript" src="motorBlocks.js"></script>
+<script type="text/javascript" src="sensorBlocks.js"></script>
 <!-- Load the Google Drive SDK Realtime libraries. -->
 <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
 <!-- Load the generic Realtime utility library. -->
@@ -214,97 +215,7 @@ h1 {
           </block>
         </value>
       </block>
-	  <!--<block type="math_random_int">
-        <value name="FROM">
-          <block type="math_number">
-            <field name="NUM">1</field>
-          </block>
-        </value>
-        <value name="TO">
-          <block type="math_number">
-            <field name="NUM">100</field>
-          </block>
-        </value>
-      </block>
-      <block type="math_random_float"></block>-->
     </category>
-    <!--<category name="Text">
-      <block type="text"></block>
-      <block type="text_join"></block>
-      <block type="text_append">
-        <value name="TEXT">
-          <block type="text"></block>
-        </value>
-      </block>
-      <block type="text_length"></block>
-      <block type="text_isEmpty"></block>
-      <block type="text_indexOf">
-        <value name="VALUE">
-          <block type="variables_get">
-            <field name="VAR">text</field>
-          </block>
-        </value>
-      </block>
-      <block type="text_charAt">
-        <value name="VALUE">
-          <block type="variables_get">
-            <field name="VAR">text</field>
-          </block>
-        </value>
-      </block>
-      <block type="text_getSubstring">
-        <value name="STRING">
-          <block type="variables_get">
-            <field name="VAR">text</field>
-          </block>
-        </value>
-      </block>
-      <block type="text_changeCase"></block>
-      <block type="text_trim"></block>
-      <block type="text_print"></block>
-      <block type="text_prompt"></block>
-    </category>-->
-    <!--<category name="Lists">
-      <block type="lists_create_empty"></block>
-      <block type="lists_create_with"></block>
-      <block type="lists_repeat">
-        <value name="NUM">
-          <block type="math_number">
-            <field name="NUM">5</field>
-          </block>
-        </value>
-      </block>
-      <block type="lists_length"></block>
-      <block type="lists_isEmpty"></block>
-      <block type="lists_indexOf">
-        <value name="VALUE">
-          <block type="variables_get">
-            <field name="VAR">list</field>
-          </block>
-        </value>
-      </block>
-      <block type="lists_getIndex">
-        <value name="VALUE">
-          <block type="variables_get">
-            <field name="VAR">list</field>
-          </block>
-        </value>
-      </block>
-      <block type="lists_setIndex">
-        <value name="LIST">
-          <block type="variables_get">
-            <field name="VAR">list</field>
-          </block>
-        </value>
-      </block>
-      <block type="lists_getSublist">
-        <value name="LIST">
-          <block type="variables_get">
-            <field name="VAR">list</field>
-          </block>
-        </value>
-      </block>
-    </category>-->
     <category name="C Blocks">
       <block type="cblocks_case"></block>
       <block type="cblocks_constants_get"></block>
@@ -349,6 +260,19 @@ h1 {
 			</value>
 		  </block>
 		  <block type="motor_constant" ></block>
+		</category>
+	    <category name="Sensors">
+		  <block type="sensor_value">
+			<value name="INPUT0">
+			  <block type="sensor_constant"></block>
+			</value>
+		  </block>
+		  <block type="sensor_raw">
+			<value name="INPUT0">
+			  <block type="sensor_constant"></block>
+			</value>
+		  </block>
+		  <block type="sensor_constant" ></block>
 		</category>
 	    <block type="wait_for_start"></block>
 	    <block type="get_joy_value"></block>
