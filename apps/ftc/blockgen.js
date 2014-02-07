@@ -123,7 +123,7 @@ Blockly.RobotC.generateSimpleBlock = function(block){
 		var code = template;
 		for (var i=0; i<numArgs; i++){
 			var input = Blockly.RobotC.valueToCode(block, 'INPUT'+i, Blockly.RobotC.ORDER_ATOMIC) || 'null';
-			code.replace('~'+i, input);
+			code = code.replace('~'+i, input);
 		}
 		if (returns){
 			return [code, Blockly.RobotC.ORDER_FUNCTION_CALL];
