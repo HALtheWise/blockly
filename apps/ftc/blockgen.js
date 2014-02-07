@@ -99,6 +99,10 @@ Blockly.RobotC.generateSimpleBlock = function(block){
 						.setCheck(arg[1] || '');
 				}
 				
+				if (block.args.length <= 1){
+					this.setInputsInline(true);
+				}
+				
 				if (typeof(block.returns) != 'undefined'){
 					this.setOutput(true, block.returns);
 				}else{
