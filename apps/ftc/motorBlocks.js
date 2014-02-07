@@ -6,7 +6,8 @@
 
 //NXT Motor Control
 //http://www.robotc.net/wiki/NXT_Motors_and_Servos_Overview
-NXT = {};
+if (typeof(NXT) == 'undefined'){
+NXT = {};}
 NXT.Motors = {};
 NXT.Motors.color = 100;
 NXT.Motors.Simplecode = [
