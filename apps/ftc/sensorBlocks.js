@@ -26,7 +26,7 @@ Blockly.RobotC['sensor_constant'] = function(block) {
 };
 
 NXT.Sensors = {};
-NXT.Sensors.color = 100;
+NXT.Sensors.color = 160;
 NXT.Sensors.Simplecode = [
 {
 	name:"sensor_value",
