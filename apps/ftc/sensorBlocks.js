@@ -20,6 +20,7 @@ Blockly.Blocks['sensor_constant'] = {
 };
 
 Blockly.RobotC['sensor_constant'] = function(block) {
+	Blockly.RobotC.definitions_['motors'] = Blockly.RobotC.motorDefs;
 	var dropdown_motor = block.getFieldValue('SENSOR');
 	var code = dropdown_motor;
 	return [code, Blockly.RobotC.ORDER_ATOMIC];

@@ -147,7 +147,7 @@ Blockly.RobotC.init = function() {
 Blockly.RobotC.finish = function(code) {
 	// Convert the definitions dictionary into a list.
 	var definitions = [];
-	var mustBeFirst = ['constants', 'variables'];
+	var mustBeFirst = ['motors', 'constants', 'variables'];
 	for (var name in mustBeFirst){
 		if (mustBeFirst[name] in Blockly.RobotC.definitions_){
 			definitions.push(Blockly.RobotC.definitions_[mustBeFirst[name]]);
