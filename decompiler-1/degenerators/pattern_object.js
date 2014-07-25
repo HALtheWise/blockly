@@ -133,7 +133,7 @@ Blockly.Degenerator.Pattern.statementEndMatch = function(match){
 		return match;
 	}
 
-	var semicolonMatch = s.match(/^[\s]*;/)
+	var semicolonMatch = s.match(/^[\s]*(?:;|$)/)
 	if (semicolonMatch){ //At end of line (give or take whitespace)
 		match.unmatched = s.slice(semicolonMatch.length);
 		return match;
