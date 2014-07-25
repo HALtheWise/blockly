@@ -158,7 +158,7 @@ Blockly.Degenerator.prototype.tokenizeNew = function(s, lang){ //scans backward
 		{pattern:/\|block:[0-9]*~~input:[^~\|]*~~order:[0-9]*\|/g, //Expression input
 		 f: function(s, match, list){
 			 var index = s.lastIndexOf(match)
-			 var pat   = s.slice(index + match.length).trim()
+			 var pat   = s.slice(index + match.length)
 			 var fieldName = match.match(/input:[^~]*/)[0].split(':')[1]
 			 list.push(
 				 function(match){return Blockly.Degenerator.Pattern.stringMatch(pat, match)});
@@ -170,7 +170,7 @@ Blockly.Degenerator.prototype.tokenizeNew = function(s, lang){ //scans backward
 		{pattern:/\|block:[0-9]*~~input:[^\|~]*\|/g, //Statement input
 		 f: function(s, match, list){
 			 var index = s.lastIndexOf(match)
-			 var pat   = s.slice(index + match.length).trim()
+			 var pat   = s.slice(index + match.length)
 			 var fieldName = match.match(/input:[^\|]*/)[0].split(':')[1]
 			 list.push(
 				 function(match){return Blockly.Degenerator.Pattern.stringMatch(pat, match)});
