@@ -78,10 +78,9 @@ Blockly.Degenerate.JavaScript.setupControls = function(pats){
 	pats = pats.concat(testAllInputs("controls_flow_statements",{FLOW: 'BREAK CONTINUE'.split(' ')}))
 	for (var ifelse = 0; ifelse <= 5; ifelse++){ //controls_if
 		var mutation = '<mutation elseif="' + String(ifelse) + '"></mutation>'
-		console.log(mutation)
 		pats.push(testInput('controls_if', {}, mutation)) //No else block
-		//pats.push(testInput(testInput('controls_if', {}, 
-		//	'<mutation elseif="' + String(ifelse) + '" else="1"></mutation>')))//Else block
+		var mutation = '<mutation elseif="' + String(ifelse) + '" else="1"></mutation>'
+		pats.push(testInput('controls_if', {}, mutation)) //Else block
 	}
 	return pats
 }
