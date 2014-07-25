@@ -1,0 +1,437 @@
+/**
+ * @license
+ * Visual Blocks Editor
+ *
+ * Copyright 2012 Google Inc.
+ * https://blockly.googlecode.com/
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @fileoverview Utility functions for generating executable code from
+ * Blockly code.
+ * @author eric@legoaces.org (Eric Miller)
+ */
+'use strict';
+
+goog.provide('Blockly.Degenerator');
+
+goog.require('Blockly.Block');
+
+
+/**
+ * Class for a code generator that translates the blocks into a language.
+ * @param {string} name Language name of this generator.
+ * @constructor
+ */
+Blockly.Degenerator = function(name) {
+  this.name_ = name;
+  this.ePatterns = [];
+  this.RESERVED_WORDS_ = '';
+};
+
+/**
+ * Category to separate generated function names from variables and procedures.
+ */
+Blockly.Degenerator.NAME_TYPE = 'generated_function';
+
+/**
+ * Generate code for all blocks in the workspace to the specified language.
+ * @return {string} Generated code.
+ */
+Blockly.Degenerator.prototype.codeToWorkspace = function(code) {
+
+
+  /* 
+  code=[]
+  this.init();
+  var blocks = Blockly.mainWorkspace.getTopBlocks(true);
+  for (var x = 0, block; block = blocks[x]; x++) {
+    var line = this.blockToCode(block);
+    if (goog.isArray(line)) {
+      // Value blocks return tuples of code and operator order.
+      // Top-level blocks don't care about operator order.
+      line = line[0];
+    }
+    if (line) {
+      if (block.outputConnection && this.scrubNakedValue) {
+        // This block is a naked value.  Ask the language's code generator if
+        // it wants to append a semicolon, or something.
+        line = this.scrubNakedValue(line);
+      }
+      code.push(line);
+    }
+  }
+  code = code.join('\n');  // Blank line between each section.
+  code = this.finish(code);
+  // Final scrubbing of whitespace.
+  code = code.replace(/^\s+\n/, '');
+  code = code.replace(/\n\s+$/, '\n');
+  code = code.replace(/[ \t]+\n/g, '\n');
+  return code; */
+};
+
+Blockly.Degenerator.prototype.statementMatch = function(patterns, ePatterns, sequence){
+	if (typeof(sequence) == 'string') sequence = new Blockly.Degenerator.Sequence(sequence)
+	
+	
+	while (sequence.unmatched.length>0){
+		sequence.unmatched = sequence.unmatched.trim()
+		
+		var results = []
+		for (var i = 0; i < patterns.length; i++){
+			if (typeof(patterns[i]) == 'function'){
+				var ret = patterns[i](sequence.getMatch()) //semi-deep copy
+				if (!ret) continue
+				results.push(ret)
+			}else{
+				var pat = patterns[i].pattern
+				var match = sequence.getMatch(); //semi-deep copy
+				
+				match = this.patternMatch(pat, match, false)
+				if (!match) continue
+				console.log("Match returned from patternMatch: %o", match)
+				match.matched(patterns[i].block, patterns[i].args)
+				
+				results.push(match)
+			}
+		}
+		if (results.length == 0){ console.log("No matches found for Sequence: %o", sequence); return 'fail, no matches'}
+		
+		var max = results[0]
+		for (var i = 0; i < results.length; i++){
+			var res = results[i]
+			if (res.code.length > max.code.length){ //Take the longest potential match
+				max=res
+			}
+		}
+		console.log("Sequence %o: longest match: %o", sequence, max)
+		
+		sequence.matched(max)
+		var ses = max.getSubExpressions()
+		
+		for (var i = 0; i < ses.length; i++){ //Recurse expressions
+			var ter = ses[i]
+			ter = this.expressionMatch(ePatterns, ter)
+		}
+
+
+		var statements = max.getSubStatements()
+		console.log("subStatements to recurse: %o", statements)
+		for (var i = 0; i < statements.length; i++){ //Recurse statements
+			var ter = statements[i]
+			console.log("recursing statement: %o", ter)
+			ter = this.statementMatch(patterns, ter)
+		}
+	}
+	return results, sequence
+
+}
+
+// The following are some helpful functions which can be used by multiple
+// languages.
+
+/**
+ * Prepend a common prefix onto each line of code.
+ * @param {string} text The lines of code.
+ * @param {string} prefix The common prefix.
+ * @return {string} The prefixed lines of code.
+ */
+Blockly.Degenerator.prototype.prefixLines = function(text, prefix) {
+  return prefix + text.replace(/\n(.)/g, '\n' + prefix + '$1');
+};
+
+Blockly.Degenerator.prototype.expressionMatch = function(patterns, match){
+	if (typeof(match) == 'string') match = new Blockly.Degenerator.Match(match)
+	
+	match.code = this.pstrip(match.code)
+
+	var results = []
+	for (var i = 0; i < patterns.length; i++){
+		if (typeof(patterns[i]) == 'function'){
+			var ret = patterns[i](match.clone()) //semi-deep copy
+			if (!ret) continue
+			results.push(ret)
+		}else{
+			var pat = patterns[i].pattern
+			var match1 = match.clone(); //semi-deep copy
+			match1 = this.patternMatch(pat[0], match1)
+			if (!match1) continue
+			console.log(match1)
+			match1.bind = pat[1]
+			match1.matched(patterns[i].block, patterns[i].args)
+			
+			results.push(match1)
+		}
+	}
+	if (results.length == 0) return 'fail, no matches'
+	
+	var max = results[0]
+	for (var i = 0; i < results.length; i++){
+		var res = results[i]
+		if (res.bind > max.bind){
+			max=res
+		}
+	}
+	console.log(max)
+	
+	match.bind = max.bind
+	match.block = max.block
+	match.fields = max.fields
+	match.subExpressions = max.subExpressions
+	
+	var ses = match.getSubExpressions()
+	for (var i = 0; i < ses.length; i++){ //Recurse
+		var ter = ses[i]
+		ter = this.expressionMatch(patterns, ter)
+	}
+	
+	return results, match
+}
+
+Blockly.Degenerator.prototype.pstrip = function(s){
+	s = s.trim()
+	if (s[0] == '(' && this.lenToMatch(s.slice(1), ')') == s.length-2){
+		//Thing begins and ends with parenthesis
+		s = s.slice(1, s.length-1)
+		s = s.trim()
+	}
+	return s
+}
+
+Blockly.Degenerator.prototype.patternMatch = function(pattern, match, requireEnd){
+	if (typeof(pattern) == 'function') return pattern(match)
+	if (typeof(requireEnd) == 'undefined') requireEnd = true
+
+	var tokens = this.tokenize(pattern)
+	if (tokens.length % 2 != 1) throw Error()
+	var j = 0
+
+	// console.log(tokens)
+	
+	var subExpressions = []
+	var subStatements = []
+	
+	for (var i = 0; i < tokens.length; i += 2){
+		var t = tokens[i] //should always be string
+		
+		if (i==0){ //This is the first token.
+			if (match.code.indexOf(t) != 0) return false //String does not start with first token!
+			j += t.length
+		}
+		if (i>0){
+			var p = tokens[i-1] //previous token. Should be object.
+			if (p.k.split(':').length == 4){ //Previous token is valueInput
+				var valueInput = p.k.split(':')[2].split('~')[0]
+				console.log('ValueInput detected:%s', valueInput)
+				p.start = j
+				//console.log(string.slice(j))
+				var d = this.lenToMatch(match.code.slice(j), t)
+				if (d < 0) return false //The next token did not exist in the remaining string
+				j += d
+				p.end = j
+				p.string = match.code.slice(p.start, p.end)
+			
+				subExpressions.push({valueInput: valueInput, code: p.string})
+			}else{ //Previous Token is statementInput
+				var statementInput = p.k.split(':')[2].split('|')[0]
+				console.log('StatementInput detected:%s', statementInput)
+				p.start = j
+				//console.log(string.slice(j))
+				var d = this.lenToMatch(match.code.slice(j), t)
+				if (d < 0) return false //The next token did not exist in the remaining string
+				j += d
+				p.end = j
+				p.string = match.code.slice(p.start, p.end)
+			
+				subStatements.push({statementInput: statementInput, code: p.string})
+			}
+			j += t.length
+		}
+		if (i == tokens.length - 1){ //Last token
+			if (requireEnd){
+				if (j != match.code.length){ //Last token not at end of string
+					return false
+				}
+			}else{
+				match.code = match.code.slice(0,j)
+			}
+		}
+		
+	}
+	console.log(subExpressions)
+	
+	for (var i = 0; i < subExpressions.length; i++){ //Copy the subexpressions into the origional match object.
+		var se = subExpressions[i]
+		match.addSubExpression(se.valueInput, se.code)
+	}
+	
+	for (var i = 0; i < subStatements.length; i++){ //Copy the subStatements into the origional match object.
+		var se = subStatements[i]
+		match.addSubStatement(se.statementInput, se.code)
+	}
+	
+	return match;
+}
+
+Blockly.Degenerator.prototype.tokenize = function(pattern){
+	var tokens = []
+	
+	while (true){
+		var r = pattern.match(/\|block:[0-9]*~~input:[^~]*~~order:[0-9]*\|/)
+		if (!r || r.length == 0 || r[0].length == 0) {
+			r = pattern.match(/\|block:[0-9]*~~input:[^\|]*\|/)
+		}
+		if (!r || r.length == 0 || r[0].length == 0){
+			tokens.push(pattern)
+			break
+		}
+		r = r[0]
+		var i = pattern.indexOf(r)
+		tokens.push(pattern.slice(0,i))
+		tokens.push({k:r})
+		pattern = pattern.slice(i+r.length)
+	}
+	return tokens
+}
+
+Blockly.Degenerator.prototype.lenToMatch = function(s, end) {
+	if (end.length == 0) return s.length
+	var inQuote = ''
+	var inParens = []
+	var i=0
+	var quotes = '\'"' // " , '
+	var parens = {'(':')','{':'}','[':']'}
+	while (i < s.length){
+		var c = s[i]
+		if (inQuote){
+			if (c == '\\'){ //single backslash
+				i++ //Skip the next character
+			}
+			if (c == inQuote){
+				inQuote = '' //Exit quote
+			}
+		}else if (inParens.length > 0){
+			var p = parens[inParens[inParens.length-1]]
+			if (c == p){
+				inParens.pop()
+			}
+		}else{
+			var done = s.slice(i).indexOf(end) == 0
+			if (done) return i
+			if (quotes.indexOf(c) >= 0){
+				inQuote = c
+			}
+			if (c in parens){
+				inParens.push(c)
+			}
+		}
+		i++
+	}
+	return -1; //Thing not found
+}
+
+Blockly.Degenerator.prototype.iterNoParens = function(s, callback, nullParens) {
+	if (typeof(nullParens) == 'undefined') nullParens = true
+	var inQuote = ''
+	var inParens = []
+	var i=0
+	var quotes = '\'"' // " , '
+	var openers = '({['
+	var closers = {'(':')','{':'}','[':']'}
+	while (i < s.length){
+		var c = s[i]
+		if (inQuote){
+			if (c == '\\'){
+				i++ //Skip the next character
+			}
+			if (c == inQuote){
+				var end = callback(i)
+				if (end) return end
+				inQuote = '' //Exit quote
+			}
+		}else if (inParens.length > 0){
+			var p = closers[inParens[inParens.length-1]]
+			if (c == p){
+				var end = callback(i)
+				if (end) return end
+				inParens.pop()
+			}else if (!nullParens){
+				var end = callback(i)
+				if (end) return end
+			}
+		}else{
+			var end = callback(i)
+			if (end) return end
+			if (quotes.indexOf(c) >= 0){
+				inQuote = c
+			}
+			if (openers.indexOf(c) >= 0){
+				inParens.push(c)
+			}
+		}
+		i++
+	}
+}
+
+function testInput(blockType, test){
+	// console.log(test)
+	var oldV2C = Blockly.JavaScript.valueToCode
+	var oldS2C = Blockly.JavaScript.statementToCode
+	Blockly.JavaScript.valueToCode = function(block, input, order) {
+		return '|block:'+String(block.id)+
+				'~~input:'+String(input)+'~~order:'+String(order)+'|'}
+	Blockly.JavaScript.statementToCode = function(block, input) {
+		return '|block:'+String(block.id)+
+				'~~input:'+String(input)+'|'}
+			
+	var block = Blockly.Block.obtain(Blockly.mainWorkspace, blockType)
+	var allkeys = Object.keys(test)
+
+	var testClone = {}
+	for (var i = 0; i < allkeys.length; i++){
+		testClone[allkeys[i]] = test[allkeys[i]]
+		block.setFieldValue(test[allkeys[i]], allkeys[i])
+	}
+	var result = Blockly.JavaScript.blockToCode(block)
+	block.dispose()
+	Blockly.JavaScript.valueToCode = oldV2C
+	Blockly.JavaScript.statementToCode = oldS2C
+	if (result[result.length-1] == '\n') result = result.slice(0, result.length-1)
+	return {pattern: result, block: blockType, args: testClone}
+}
+
+function testAllInputs(blockType, tests){
+	if (typeof(tests) == 'undefined') tests = {}
+	var allKeys = Object.keys(tests)
+	var foundList = false
+	for (var i = 0; i < allKeys.length; i++){
+		var k = allKeys[i]
+		var v = tests[k]
+		if (typeof(v) == 'object'){
+			foundList = true
+			var results = []
+			var origional = v
+			for (var j = 0; j < v.length; j++){
+				tests[k] = v[j]
+				results = results.concat(testAllInputs(blockType, tests))
+			}
+			tests[k] = v
+			return results
+		}
+	}
+	if (!foundList){
+		return [testInput(blockType, tests)]
+	}
+}
