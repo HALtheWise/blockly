@@ -45,15 +45,21 @@ Blockly.Degenerator = function(name, generator) {
 	this.generator = generator
 };
  
-Blockly.Degenerator.prototype.WHITESPACE_FREE_CHARS = '\\+\\-'+'\\*\\/'+'\\(\\)'+'\\{\\}'
+Blockly.Degenerator.prototype.WHITESPACE_FREE_CHARS = '\\-\\+'+'\\*\\/'+'\\(\\)'+'\\{\\}'+'\\.'
 
 Blockly.Degenerator.prototype.PRE_FILTER = function(s){
-	var forwardMatch = "([" + this.WHITESPACE_FREE_CHARS + "])[^\\S\\n]+(?!\\1)"
+	var forwardMatch = "([" + this.WHITESPACE_FREE_CHARS + "])[^\\S\\n]+(?!\\1)" //Matches 
 	var reverseMatch = "(.)[^\\S\\n]+(?!\\2)[" + this.WHITESPACE_FREE_CHARS + "]"
-	var regex = new RegExp(forwardMatch + '|' + reverseMatch, 'g')
+
 	var old=s
+
+	var regex = new RegExp(forwardMatch, 'g')
 	s = s.replace(regex, function(s){return s.replace(/\s+/, '')})
-	console.log('regex: %o\norigional string: "%s"; filtered: "%s"',regex, old, s)
+	
+	regex = new RegExp(reverseMatch, 'g')
+	s = s.replace(regex, function(s){return s.replace(/\s+/, '')})
+	
+	console.debug('regex: %o\norigional string: "%s"; filtered: "%s"',regex, old, s)
 	return s
 }
 

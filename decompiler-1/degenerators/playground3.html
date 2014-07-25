@@ -323,6 +323,9 @@ h1 {
     <input type="button" value="To Dart" onclick="toCode('Dart')">
     <br>
     <input type="button" value="From JavaScript" onclick="fromJs()">
+    &nbsp;
+    LiveTranslate!
+    <input type="checkbox" id="livetranslate" onchange="document.getElementById('importExport').oninput = this.checked ? fromJs : null">
     <br>
     <textarea id="importExport" style="width: 26%; height: 12em"></textarea>
   </p>

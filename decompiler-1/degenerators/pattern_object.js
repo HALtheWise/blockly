@@ -127,15 +127,9 @@ Blockly.Degenerator.Pattern.untilStringMatch = function(degenerator, pat, match)
 Blockly.Degenerator.Pattern.statementEndMatch = function(match){
 	var s = match.unmatched;
 
-	var lineEndMatch = s.match(/^[^\S\n]*\n+/)
+	var lineEndMatch = s.match(/[^\n\S]*(?:;\s*|\n\s*|$)/)
 	if (lineEndMatch){ //At end of line (give or take whitespace)
 		match.unmatched = s.slice(lineEndMatch.length);
-		return match;
-	}
-
-	var semicolonMatch = s.match(/^[\s]*(?:;|$)/)
-	if (semicolonMatch){ //At end of line (give or take whitespace)
-		match.unmatched = s.slice(semicolonMatch.length);
 		return match;
 	}
 
