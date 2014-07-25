@@ -44,8 +44,18 @@ Blockly.Degenerator = function(name, generator) {
 	this.RESERVED_WORDS_ = '';
 	this.generator = generator
 };
+ 
+Blockly.Degenerator.prototype.WHITESPACE_FREE_CHARS = '\\+\\-'+'\\*\\/'+'\\(\\)'+'\\{\\}'
 
-Blockly.Degenerator.prototype.PRE_FILTER = function(s){return s}
+Blockly.Degenerator.prototype.PRE_FILTER = function(s){
+	var forwardMatch = "([" + this.WHITESPACE_FREE_CHARS + "])[^\\S\n]+(?!\\1)"
+	var reverseMatch = "(.)[^\\S\n]+(?!\\2)[" + this.WHITESPACE_FREE_CHARS + "]"
+	var regex = new RegExp(forwardMatch + '|' + reverseMatch, 'g')
+	var old=s
+	s = s.replace(regex, function(s){return s.replace(/\s+/, '')})
+	console.log('regex: %o\norigional string: "%s"; filtered: "%s"',regex, old, s)
+	return s
+}
 
 /**
  * Category to separate generated function names from variables and procedures.

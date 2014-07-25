@@ -62,6 +62,7 @@ Blockly.Degenerator.Pattern.prototype.toBlock = function(match){
 
 	for (var i = 0; i < match.subStatements.length; i++){ //recurse subStatements
 		var stmt = match.subStatements[i]
+		if (!stmt.match) continue;
 		var newBlock = stmt.match.toBlock()
 
 		block.getInput(stmt.value).connection.connect(newBlock.previousConnection)
@@ -85,6 +86,7 @@ Blockly.Degenerator.Pattern.expressionMatch = function(degenerator, nextToken, f
 
 Blockly.Degenerator.Pattern.statementMatch = function(degenerator, nextToken, fieldName, match) { //match internal expression
 	var t = Blockly.Degenerator.Pattern.untilStringMatch(degenerator, nextToken, match);
+	if (!t) return t
 	match = t[0]
 	match.addSubStatement(fieldName, t[1])
 	return match
