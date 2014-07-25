@@ -112,7 +112,12 @@ Blockly.Degenerator.prototype.applyAll = function(string, patterns, noRecurse, n
 	}
 	if (matches.length == 0) return false
 
-	matches.sort(function(a,b){return a.getPriority() - b.getPriority()}) //sorts in ascending order by priority
+	matches.sort(
+	function(a,b){
+		if (a.unmatched.trim().length != b.unmatched.trim().length){
+			return b.unmatched.trim().length - a.unmatched.trim().length //Prefer solutions that consume more of the string
+		}
+		return a.getPriority() - b.getPriority()}) //sorts in ascending order by priority
 
 	var match = matches[matches.length-1] //Highest priority match is returned
 
@@ -263,15 +268,6 @@ Blockly.Degenerator.prototype.statementMatch = function(patterns, ePatterns, seq
 // The following are some helpful functions which can be used by multiple
 // languages.
 
-/**
- * Prepend a common prefix onto each line of code.
- * @param {string} text The lines of code.
- * @param {string} prefix The common prefix.
- * @return {string} The prefixed lines of code.
- */
-Blockly.Degenerator.prototype.prefixLines = function(text, prefix) {
-	return prefix + text.replace(/\n(.)/g, '\n' + prefix + '$1');
-};
 
 Blockly.Degenerator.prototype.expressionMatch = function(patterns, match){
 	if (typeof(match) == 'string') match = new Blockly.Degenerator.Match(match)
@@ -438,7 +434,7 @@ Blockly.Degenerator.prototype.lenToMatch = function(s, end) {
 		}
 		i++
 	}
-	return -1; //Thing not found
+	return -1;
 }
 
 Blockly.Degenerator.prototype.iterNoParens = function(s, callback, nullParens) {
