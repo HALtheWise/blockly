@@ -31,11 +31,13 @@ Blockly.Degenerator.Pattern = function(pattern, block, fields, priority){
 	this.block = block; //'';
 	this.fields = fields; //new Object();
 	this.priority = priority;
+	this.mutation = undefined;
 }
 
 Blockly.Degenerator.Pattern.prototype.toBlock = function(match){
 
 	var block = Blockly.Block.obtain(Blockly.mainWorkspace, this.block)
+	if (this.mutation) Blockly.Degenerator.applyMutation(block, this.mutation)
 	block.initSvg()
 	block.render()
 

@@ -48,8 +48,8 @@ Blockly.Degenerator = function(name, generator) {
 Blockly.Degenerator.prototype.WHITESPACE_FREE_CHARS = '\\+\\-'+'\\*\\/'+'\\(\\)'+'\\{\\}'
 
 Blockly.Degenerator.prototype.PRE_FILTER = function(s){
-	var forwardMatch = "([" + this.WHITESPACE_FREE_CHARS + "])[^\\S\n]+(?!\\1)"
-	var reverseMatch = "(.)[^\\S\n]+(?!\\2)[" + this.WHITESPACE_FREE_CHARS + "]"
+	var forwardMatch = "([" + this.WHITESPACE_FREE_CHARS + "])[^\\S\\n]+(?!\\1)"
+	var reverseMatch = "(.)[^\\S\\n]+(?!\\2)[" + this.WHITESPACE_FREE_CHARS + "]"
 	var regex = new RegExp(forwardMatch + '|' + reverseMatch, 'g')
 	var old=s
 	s = s.replace(regex, function(s){return s.replace(/\s+/, '')})
@@ -517,17 +517,20 @@ function testInput(blockType, test, mutation){
 		priority = result[1]
 		result = result[0]
 		isExpression = true
-	}	
+	}
 	block.dispose()
 	Blockly.JavaScript.valueToCode = oldV2C
 	Blockly.JavaScript.statementToCode = oldS2C
 	
-	result = Blockly.Degenerate.JavaScript.PRE_FILTER(result)
+	result = Blockly.Degenerate.JavaScript.PRE_FILTER(result.trim())
 
 	var tokens = Blockly.Degenerate.JavaScript.tokenizeNew(result, Blockly.Degenerate.JavaScript)
 	if (isExpression) tokens.push(Blockly.Degenerator.Pattern.endMatch)
 
-	return new Blockly.Degenerator.Pattern(tokens, blockType, testClone, priority)
+	var pattern = new Blockly.Degenerator.Pattern(tokens, blockType, testClone, priority)
+	if (mutation) pattern.mutation = mutation
+	pattern.string = result
+	return pattern
 }
 
 Blockly.Degenerator.applyMutation = function(block, string){
