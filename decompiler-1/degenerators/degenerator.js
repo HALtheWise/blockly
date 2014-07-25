@@ -45,6 +45,8 @@ Blockly.Degenerator = function(name, generator) {
 	this.generator = generator
 };
 
+Blockly.Degenerator.prototype.PRE_FILTER = function(s){return s}
+
 /**
  * Category to separate generated function names from variables and procedures.
  */
@@ -63,6 +65,30 @@ Blockly.Degenerator.prototype.apply = function(string, pattern){
 	m.pattern = pattern
 	return m
 }
+
+Blockly.Degenerator.prototype.codeToWorkspace = function(code) {
+	var match = this.codeToBlock(code)
+	if (match){
+		Blockly.getMainWorkspace().clear()
+		match.toBlock()
+	}
+}
+
+/**
+ * Given a code string, returns the Blockly block representing the same program
+ * @return {Blockly.Degenerator.Match} Degenerated match object.
+ */
+Blockly.Degenerator.prototype.codeToBlock = function(code, patterns) {
+	code = this.PRE_FILTER(code)
+	
+	if (typeof patterns == 'undefined'){
+		patterns = this.sPatterns
+	}
+	
+	return this.applyAll(code, patterns, false, false)
+};
+
+
 
 Blockly.Degenerator.prototype.applyAll = function(string, patterns, noRecurse, noExtend){
 	string = this.pstrip(string)
@@ -175,12 +201,6 @@ Blockly.Degenerator.prototype.tokenizeNew = function(s, lang){ //scans backward
 	return allpats
 }
 
-/**
- * Generate code for all blocks in the workspace in the specified language.
- * @return {string} Generated code.
- */
-//Blockly.Degenerator.prototype.codeToWorkspace = function(code) {
-//};
 
 Blockly.Degenerator.prototype.statementMatch = function(patterns, ePatterns, sequence){
 	if (typeof(sequence) == 'string') sequence = new Blockly.Degenerator.Sequence(sequence)
@@ -487,10 +507,12 @@ function testInput(blockType, test, mutation){
 		priority = result[1]
 		result = result[0]
 		isExpression = true
-	}
+	}	
 	block.dispose()
 	Blockly.JavaScript.valueToCode = oldV2C
 	Blockly.JavaScript.statementToCode = oldS2C
+	
+	result = Blockly.Degenerate.JavaScript.PRE_FILTER(result)
 
 	var tokens = Blockly.Degenerate.JavaScript.tokenizeNew(result, Blockly.Degenerate.JavaScript)
 	if (isExpression) tokens.push(Blockly.Degenerator.Pattern.endMatch)

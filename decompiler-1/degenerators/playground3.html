@@ -61,8 +61,10 @@ function toCode(lang) {
 }
 
 function fromJs() {
-  Blockly.getMainWorkspace().clear()
   var output = document.getElementById('importExport');
+  Blockly.Degenerate.JavaScript.codeToWorkspace(output.value)
+  return
+  Blockly.getMainWorkspace().clear()
   var m = Blockly.Degenerate.JavaScript.applyAll(output.value, Blockly.Degenerate.JavaScript.sPatterns)
   m.toBlock()
 }
