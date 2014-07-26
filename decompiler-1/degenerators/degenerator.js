@@ -337,7 +337,7 @@ Blockly.Degenerator.prototype.pstrip = function(s){
 	return s
 }
 
-RegExp.escape = function(str) {
+RegExp.escape = function(str) { //voodoo from http://stackoverflow.com/a/6969486
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
 
