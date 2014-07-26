@@ -45,11 +45,13 @@ Blockly.Degenerator = function(name, generator) {
 	this.generator = generator
 };
  
-Blockly.Degenerator.prototype.WHITESPACE_FREE_CHARS = '\\-\\+'+'\\*\\/'+'\\(\\)'+'\\{\\}'+'\\.'
 
-Blockly.Degenerator.prototype.PRE_FILTER = function(s){
-	var forwardMatch = "([" + this.WHITESPACE_FREE_CHARS + "])[^\\S\\n]+(?!\\1)" //Matches 
-	var reverseMatch = "(.)[^\\S\\n]+(?!\\2)[" + this.WHITESPACE_FREE_CHARS + "]"
+Blockly.Degenerator.prototype.PRE_FILTER = function(s){return s}
+Blockly.Degenerator.prototype._preFilter = function(s){
+	s = this.PRE_FILTER(s)
+	var WHITESPACE_FREE_CHARS = RegExp.escape('+-*/%(){}[]&|<>=!')
+	var forwardMatch = "([" + WHITESPACE_FREE_CHARS + "])[^\\S\\n]+(?!\\1)" //Matches [special character] [space] [other character]
+	var reverseMatch = "(.)[^\\S\\n]+(?!\\2)[" + WHITESPACE_FREE_CHARS + "]"//Matches [other character] [space] [special character]
 
 	var old=s
 
@@ -95,7 +97,7 @@ Blockly.Degenerator.prototype.codeToWorkspace = function(code) {
  * @return {Blockly.Degenerator.Match} Degenerated match object.
  */
 Blockly.Degenerator.prototype.codeToBlock = function(code, patterns) {
-	code = this.PRE_FILTER(code)
+	code = this._preFilter(code)
 	
 	if (typeof patterns == 'undefined'){
 		patterns = this.sPatterns
@@ -173,10 +175,11 @@ Blockly.Degenerator.prototype.tokenizeNew = function(s, lang){ //scans backward
 			 var fieldName = match.match(/input:[^~]*/)[0].split(':')[1]
 			 list.push(
 				 function(match){return Blockly.Degenerator.Pattern.stringMatch(pat, match)});
-			 list.push(Blockly.Degenerator.Pattern.whitespaceMatch)
+			 //list.push(Blockly.Degenerator.Pattern.whitespaceMatch)
 			 list.push(
 				 function(match){return Blockly.Degenerator.Pattern.expressionMatch(lang, pat, fieldName, match)});
-			 list.push(Blockly.Degenerator.Pattern.whitespaceMatch)}},
+			 //list.push(Blockly.Degenerator.Pattern.whitespaceMatch)
+			 }},
 
 		{pattern:/\|block:[0-9]*~~input:[^\|~]*\|/g, //Statement input
 		 f: function(s, match, list){
@@ -185,10 +188,11 @@ Blockly.Degenerator.prototype.tokenizeNew = function(s, lang){ //scans backward
 			 var fieldName = match.match(/input:[^\|]*/)[0].split(':')[1]
 			 list.push(
 				 function(match){return Blockly.Degenerator.Pattern.stringMatch(pat, match)});
-			 list.push(Blockly.Degenerator.Pattern.whitespaceMatch)
+			 //list.push(Blockly.Degenerator.Pattern.whitespaceMatch)
 			 list.push(
 				 function(match){return Blockly.Degenerator.Pattern.statementMatch(lang, pat, fieldName, match)});
-			 list.push(Blockly.Degenerator.Pattern.whitespaceMatch)}}
+			 //list.push(Blockly.Degenerator.Pattern.whitespaceMatch)
+			 }}
 	]
 
 	var matches = []
@@ -331,6 +335,10 @@ Blockly.Degenerator.prototype.pstrip = function(s){
 		s = s.trim()
 	}
 	return s
+}
+
+RegExp.escape = function(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
 
 Blockly.Degenerator.prototype.patternMatch = function(pattern, match, requireEnd){
@@ -524,7 +532,7 @@ function testInput(blockType, test, mutation){
 	Blockly.JavaScript.valueToCode = oldV2C
 	Blockly.JavaScript.statementToCode = oldS2C
 	
-	result = Blockly.Degenerate.JavaScript.PRE_FILTER(result.trim())
+	result = Blockly.Degenerate.JavaScript._preFilter(result.trim())
 
 	var tokens = Blockly.Degenerate.JavaScript.tokenizeNew(result, Blockly.Degenerate.JavaScript)
 	if (isExpression) tokens.push(Blockly.Degenerator.Pattern.endMatch)
