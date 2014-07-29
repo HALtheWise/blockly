@@ -60,11 +60,10 @@ Blockly.Degenerate.JavaScript.setupMath = function(pats){
 	pats = pats.concat(testAllInputs("math_random_float"))
 
 	var isNum = function(match){
-		var x = parseFloat(match.unmatched)
-    var isNum = String(x) == match.unmatched || String(x) == '0'+match.unmatched
-    if (!isNum) return false
-    match.unmatched = ''
-    return match
+		var isNum = Blockly.isNumber(match.unmatched)
+		if (!isNum) return false
+		match.unmatched = ''
+    	return match
   }
 
   var numPat = new Blockly.Degenerator.Pattern([isNum], 'math_number', {NUM: function(match){return match.code}})
