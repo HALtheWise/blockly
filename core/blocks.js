@@ -1,8 +1,9 @@
 /**
+ * @license
  * Visual Blocks Editor
  *
  * Copyright 2013 Google Inc.
- * http://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +19,8 @@
  */
 
 /**
- * @fileoverview Core JavaScript library for Blockly.
- * @author fraser@google.com (Neil Fraser)
+ * @fileoverview Flexible templating system for defining blocks.
+ * @author spertus@google.com (Ellen Spertus)
  */
 'use strict';
 goog.require('goog.asserts');
@@ -32,12 +33,32 @@ goog.require('goog.asserts');
 goog.provide('Blockly.Blocks');
 
 /**
+ * Unique ID counter for created blocks.
+ * @private
+ */
+Blockly.Blocks.uidCounter_ = 0;
+
+/**
+ * Generate a unique ID.  This will be locally or globally unique, depending on
+ * whether we are in single user or realtime collaborative mode.
+ * @return {string}
+ */
+Blockly.Blocks.genUid = function() {
+  var uid = (++Blockly.Blocks.uidCounter_).toString();
+  if (Blockly.Realtime.isEnabled()) {
+    return Blockly.Realtime.genUid(uid);
+  } else {
+    return uid;
+  }
+};
+
+/**
  * Create a block template and add it as a field to Blockly.Blocks with the
  * name details.blockName.
- * @param {!object} details Details about the block that should be created.
+ * @param {!Object} details Details about the block that should be created.
  *     The following fields are used:
- *     - blockName {!string} The name of the block, which should be unique.
- *     - colour {!number} The hue value of the colour to use for the block.
+ *     - blockName {string} The name of the block, which should be unique.
+ *     - colour {number} The hue value of the colour to use for the block.
  *       (Blockly.HSV_SATURATION and Blockly.HSV_VALUE are used for saturation
  *       and value, respectively.)
  *     - output {?string|Array.<string>} Output type.  If undefined, there are
@@ -46,16 +67,16 @@ goog.provide('Blockly.Blocks');
  *       - null: Any type can be produced.
  *       - String: Only the specified type (e.g., 'Number') can be produced.
  *       - Array.<string>: Any of the specified types can be produced.
- *     - message {!string} A message suitable for passing as a first argument to
+ *     - message {string} A message suitable for passing as a first argument to
  *       Blockly.Block.interpolateMsg().  Specifically, it should consist of
  *       text to be displayed on the block, optionally interspersed with
  *       references to inputs (one-based indices into the args array) or fields,
  *       such as '%1' for the first element of args.  The creation of dummy
  *       inputs can be forced with a newline (\n).
- *     - args {?Array.<object>} One or more descriptions of value inputs.
+ *     - args {Array.<Object>} One or more descriptions of value inputs.
  *       TODO: Add Fields and statement stacks.
  *       Each object in the array can have the following fields:
- *       - name {!string} The name of the input.
+ *       - name {string} The name of the input.
  *       - type {?number} One of Blockly.INPUT_VALUE, Blockly.NEXT_STATEMENT, or
  *         ??.   If not provided, it is assumed to be Blockly.INPUT_VALUE.
  *       - check {?string|Array.<string>} Input type.  See description of the
@@ -71,9 +92,9 @@ goog.provide('Blockly.Blocks');
  *     - nextStatement {?boolean} Whether there should be a statement
  *       connector on the bottom of the block.  If not specified, the default
  *       value will be !output.
- *     - tooltip {?string|function} Tooltip text or a function on this block
+ *     - tooltip {?string|Function} Tooltip text or a function on this block
  *       that returns a tooltip string.
- *     - helpUrl {?string|function} The help URL, or a function on this block
+ *     - helpUrl {?string|Function} The help URL, or a function on this block
  *       that returns the help URL.
  *     - switchable {?boolean} Whether the block should be switchable between
  *       an expression and statement.  Specifically, if true, the block will
@@ -83,9 +104,9 @@ goog.provide('Blockly.Blocks');
  *       menu option 'Remove output' will be replaced by 'Add Output'.  If
  *       selected, the output will reappear and the statement connectors will
  *       disappear.
- *     - mutationToDomFunc {?function} TODO desc.
- *     - domToMutationFunc {?function} TODO desc.
- *     - customContextMenuFunc {?function} TODO desc.
+ *     - mutationToDomFunc {Function} TODO desc.
+ *     - domToMutationFunc {Function} TODO desc.
+ *     - customContextMenuFunc {Function} TODO desc.
  *     Additional fields will be ignored.
  */
 Blockly.Blocks.addTemplate = function(details) {
@@ -106,8 +127,11 @@ Blockly.Blocks.addTemplate = function(details) {
         'details.nextStatement must not be true.');
   }
 
-  // Build up template.
   var block = {};
+  /**
+   * Build up template.
+   * @this Blockly.Block
+   */
   block.init = function() {
     var thisBlock = this;
     // Set basic properties of block.
@@ -141,8 +165,8 @@ Blockly.Blocks.addTemplate = function(details) {
         if (arg.type == 'undefined' || arg.type == Blockly.INPUT_VALUE) {
           interpArgs.push([arg.name,
                            arg.check,
-                           typeof arg.align == 'undefined' ? Blockly.ALIGN_RIGHT
-                               : arg.align]);
+                           typeof arg.align == 'undefined' ?
+                               Blockly.ALIGN_RIGHT : arg.align]);
         } else {
           // TODO: Write code for other input types.
           goog.asserts.fail('addTemplate() can only handle value inputs.');
@@ -151,18 +175,21 @@ Blockly.Blocks.addTemplate = function(details) {
     }
     // Neil, how would you recommend specifying the final dummy alignment?
     // Should it be a top-level field in details?
-    interpAgs.push(Blockly.ALIGN_RIGHT);
+    interpArgs.push(Blockly.ALIGN_RIGHT);
     if (details.inline) {
       this.setInlineInputs(details.inline);
     }
     Blockly.Block.prototype.interpolateMsg.apply(this, interpArgs);
   };
 
-  // Create mutationToDom if needed.
   if (details.switchable) {
+    /**
+     * Create mutationToDom if needed.
+     * @this Blockly.Block
+     */
     block.mutationToDom = function() {
-      var container = details.mutationToDomFunc ? details.mutatationToDomFunc()
-          : document.createElement('mutation');
+      var container = details.mutationToDomFunc ?
+          details.mutatationToDomFunc() : document.createElement('mutation');
       container.setAttribute('is_statement', this['isStatement'] || false);
       return container;
     };

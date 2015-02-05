@@ -1,8 +1,9 @@
 /**
+ * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
- * http://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,25 +72,33 @@ Blockly.removeClass_ = function(element, className) {
 };
 
 /**
+ * Checks if an element has the specified CSS class.
+ * Similar to Closure's goog.dom.classes.has, except it handles SVG elements.
+ * @param {!Element} element DOM element to check.
+ * @param {string} className Name of class to check.
+ * @return {boolean} True if class exists, false otherwise.
+ * @private
+ */
+Blockly.hasClass_ = function(element, className) {
+  var classes = element.getAttribute('class');
+  return (' ' + classes + ' ').indexOf(' ' + className + ' ') != -1;
+};
+
+/**
  * Bind an event to a function call.
- * @param {!Element} element Element upon which to listen.
+ * @param {!Node} node Node upon which to listen.
  * @param {string} name Event name to listen to (e.g. 'mousedown').
  * @param {Object} thisObject The value of 'this' in the function.
  * @param {!Function} func Function to call when event is triggered.
  * @return {!Array.<!Array>} Opaque data that can be passed to unbindEvent_.
  * @private
  */
-Blockly.bindEvent_ = function(element, name, thisObject, func) {
-  var bindData = [];
-  var wrapFunc;
-  if (!element.addEventListener) {
-    throw 'Element is not a DOM node with addEventListener.';
-  }
-  wrapFunc = function(e) {
-    func.apply(thisObject, arguments);
+Blockly.bindEvent_ = function(node, name, thisObject, func) {
+  var wrapFunc = function(e) {
+    func.call(thisObject, e);
   };
-  element.addEventListener(name, wrapFunc, false);
-  bindData.push([element, name, wrapFunc]);
+  node.addEventListener(name, wrapFunc, false);
+  var bindData = [[node, name, wrapFunc]];
   // Add equivalent touch event.
   if (name in Blockly.bindEvent_.TOUCH_MAP) {
     wrapFunc = function(e) {
@@ -100,13 +109,15 @@ Blockly.bindEvent_ = function(element, name, thisObject, func) {
         e.clientX = touchPoint.clientX;
         e.clientY = touchPoint.clientY;
       }
-      func.apply(thisObject, arguments);
-      // Stop the browser from scrolling/zooming the page
+      func.call(thisObject, e);
+      // Stop the browser from scrolling/zooming the page.
       e.preventDefault();
     };
-    element.addEventListener(Blockly.bindEvent_.TOUCH_MAP[name],
-                             wrapFunc, false);
-    bindData.push([element, Blockly.bindEvent_.TOUCH_MAP[name], wrapFunc]);
+    for (var i = 0, eventName;
+         eventName = Blockly.bindEvent_.TOUCH_MAP[name][i]; i++) {
+      node.addEventListener(eventName, wrapFunc, false);
+      bindData.push([node, eventName, wrapFunc]);
+    }
   }
   return bindData;
 };
@@ -117,11 +128,11 @@ Blockly.bindEvent_ = function(element, name, thisObject, func) {
  * @type {Object}
  */
 Blockly.bindEvent_.TOUCH_MAP = {};
-if ('ontouchstart' in document.documentElement) {
+if (goog.events.BrowserFeature.TOUCH_ENABLED) {
   Blockly.bindEvent_.TOUCH_MAP = {
-    mousedown: 'touchstart',
-    mousemove: 'touchmove',
-    mouseup: 'touchend'
+    'mousedown': ['touchstart'],
+    'mousemove': ['touchmove'],
+    'mouseup': ['touchend', 'touchcancel']
   };
 }
 
@@ -135,34 +146,73 @@ if ('ontouchstart' in document.documentElement) {
 Blockly.unbindEvent_ = function(bindData) {
   while (bindData.length) {
     var bindDatum = bindData.pop();
-    var element = bindDatum[0];
+    var node = bindDatum[0];
     var name = bindDatum[1];
     var func = bindDatum[2];
-    element.removeEventListener(name, func, false);
+    node.removeEventListener(name, func, false);
   }
   return func;
 };
 
 /**
- * Fire a synthetic event.
- * @param {!Element} element The event's target element.
+ * Fire a synthetic event synchronously.
+ * @param {!EventTarget} node The event's target node.
  * @param {string} eventName Name of event (e.g. 'click').
  */
-Blockly.fireUiEvent = function(element, eventName) {
-  var doc = document;
-  if (doc.createEvent) {
+Blockly.fireUiEventNow = function(node, eventName) {
+  // Remove the event from the anti-duplicate database.
+  var list = Blockly.fireUiEvent.DB_[eventName];
+  if (list) {
+    var i = list.indexOf(node);
+    if (i != -1) {
+      list.splice(i, 1);
+    }
+  }
+  // Fire the event in a browser-compatible way.
+  if (document.createEvent) {
     // W3
-    var evt = doc.createEvent('UIEvents');
+    var evt = document.createEvent('UIEvents');
     evt.initEvent(eventName, true, true);  // event type, bubbling, cancelable
-    element.dispatchEvent(evt);
-  } else if (doc.createEventObject) {
+    node.dispatchEvent(evt);
+  } else if (document.createEventObject) {
     // MSIE
-    var evt = doc.createEventObject();
-    element.fireEvent('on' + eventName, evt);
+    var evt = document.createEventObject();
+    node.fireEvent('on' + eventName, evt);
   } else {
     throw 'FireEvent: No event creation mechanism.';
   }
 };
+
+/**
+ * Fire a synthetic event asynchronously.  Groups of simultaneous events (e.g.
+ * a tree of blocks being deleted) are merged into one event.
+ * @param {!EventTarget} node The event's target node.
+ * @param {string} eventName Name of event (e.g. 'click').
+ */
+Blockly.fireUiEvent = function(node, eventName) {
+  var list = Blockly.fireUiEvent.DB_[eventName];
+  if (list) {
+    if (list.indexOf(node) != -1) {
+      // This event is already scheduled to fire.
+      return;
+    }
+    list.push(node);
+  } else {
+    Blockly.fireUiEvent.DB_[eventName] = [node];
+  }
+  var fire = function() {
+    Blockly.fireUiEventNow(node, eventName);
+  };
+  setTimeout(fire, 0);
+};
+
+/**
+ * Database of upcoming firing event types.
+ * Used to fire only one event after multiple changes.
+ * @type {!Object}
+ * @private
+ */
+Blockly.fireUiEvent.DB_ = {};
 
 /**
  * Don't do anything for this event, just halt propagation.
@@ -319,7 +369,7 @@ Blockly.mouseToSvg = function(e) {
 
 /**
  * Given an array of strings, return the length of the shortest one.
- * @param {!Array<string>} array Array of strings.
+ * @param {!Array.<string>} array Array of strings.
  * @return {number} Length of shortest string.
  */
 Blockly.shortestStringLength = function(array) {
@@ -336,7 +386,7 @@ Blockly.shortestStringLength = function(array) {
 /**
  * Given an array of strings, return the length of the common prefix.
  * Words may not be split.  Any space after a word is included in the length.
- * @param {!Array<string>} array Array of strings.
+ * @param {!Array.<string>} array Array of strings.
  * @param {?number} opt_shortest Length of shortest string.
  * @return {number} Length of common prefix.
  */
@@ -371,7 +421,7 @@ Blockly.commonWordPrefix = function(array, opt_shortest) {
 /**
  * Given an array of strings, return the length of the common suffix.
  * Words may not be split.  Any space after a word is included in the length.
- * @param {!Array<string>} array Array of strings.
+ * @param {!Array.<string>} array Array of strings.
  * @param {?number} opt_shortest Length of shortest string.
  * @return {number} Length of common suffix.
  */

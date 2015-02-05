@@ -1,8 +1,9 @@
 /**
+ * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
- * http://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +28,7 @@ goog.provide('Blockly.FieldLabel');
 
 goog.require('Blockly.Field');
 goog.require('Blockly.Tooltip');
+goog.require('goog.math.Size');
 
 
 /**
@@ -37,10 +39,7 @@ goog.require('Blockly.Tooltip');
  */
 Blockly.FieldLabel = function(text) {
   this.sourceBlock_ = null;
-  // Build the DOM.
-  this.textElement_ = Blockly.createSvgElement('text',
-      {'class': 'blocklyText'}, null);
-  this.size_ = {height: 25, width: 0};
+  this.size_ = new goog.math.Size(0, 25);
   this.setText(text);
 };
 goog.inherits(Blockly.FieldLabel, Blockly.Field);
@@ -65,14 +64,24 @@ Blockly.FieldLabel.prototype.EDITABLE = false;
  */
 Blockly.FieldLabel.prototype.init = function(block) {
   if (this.sourceBlock_) {
-    throw 'Text has already been initialized once.';
+    // Text has already been initialized once.
+    return;
   }
   this.sourceBlock_ = block;
+
+  // Build the DOM.
+  this.textElement_ = Blockly.createSvgElement('text',
+      {'class': 'blocklyText'}, null);
+  if (!this.visible_) {
+    this.textElement_.style.display = 'none';
+  }
   block.getSvgRoot().appendChild(this.textElement_);
 
   // Configure the field to be transparent with respect to tooltips.
   this.textElement_.tooltip = this.sourceBlock_;
-  Blockly.Tooltip && Blockly.Tooltip.bindMouseEvents(this.textElement_);
+  Blockly.Tooltip.bindMouseEvents(this.textElement_);
+  // Force a render.
+  this.updateTextNode_();
 };
 
 /**
@@ -88,7 +97,7 @@ Blockly.FieldLabel.prototype.dispose = function() {
  * Used for measuring the size and for positioning.
  * @return {!Element} The group element.
  */
-Blockly.FieldLabel.prototype.getRootElement = function() {
+Blockly.FieldLabel.prototype.getSvgRoot = function() {
   return /** @type {!Element} */ (this.textElement_);
 };
 

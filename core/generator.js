@@ -1,8 +1,9 @@
 /**
+ * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
- * http://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +38,8 @@ goog.require('Blockly.Block');
 Blockly.Generator = function(name) {
   this.name_ = name;
   this.RESERVED_WORDS_ = '';
+  this.FUNCTION_NAME_PLACEHOLDER_REGEXP_ =
+      new RegExp(this.FUNCTION_NAME_PLACEHOLDER_, 'g');
 };
 
 /**
@@ -45,16 +48,35 @@ Blockly.Generator = function(name) {
 Blockly.Generator.NAME_TYPE = 'generated_function';
 
 /**
+ * Arbitrary code to inject into locations that risk causing infinite loops.
+ * Any instances of '%1' will be replaced by the block ID that failed.
+ * E.g. '  checkTimeout(%1);\n'
+ * @type ?string
+ */
+Blockly.Generator.prototype.INFINITE_LOOP_TRAP = null;
+
+/**
+ * Arbitrary code to inject before every statement.
+ * Any instances of '%1' will be replaced by the block ID of the statement.
+ * E.g. 'highlight(%1);\n'
+ * @type ?string
+ */
+Blockly.Generator.prototype.STATEMENT_PREFIX = null;
+
+/**
  * Generate code for all blocks in the workspace to the specified language.
+ * @param {Blockly.Workspace=} opt_workspace Workspace to generate code from.
+ *     Defaults to main workspace.
  * @return {string} Generated code.
  */
-Blockly.Generator.prototype.workspaceToCode = function() {
+Blockly.Generator.prototype.workspaceToCode = function(opt_workspace) {
+  var workspace = opt_workspace || Blockly.mainWorkspace;
   var code = [];
-  this.init();
-  var blocks = Blockly.mainWorkspace.getTopBlocks(true);
+  this.init(workspace);
+  var blocks = workspace.getTopBlocks(true);
   for (var x = 0, block; block = blocks[x]; x++) {
     var line = this.blockToCode(block);
-    if (line instanceof Array) {
+    if (goog.isArray(line)) {
       // Value blocks return tuples of code and operator order.
       // Top-level blocks don't care about operator order.
       line = line[0];
@@ -124,8 +146,7 @@ Blockly.Generator.prototype.blockToCode = function(block) {
   }
   if (block.disabled) {
     // Skip past this block if it is disabled.
-    var nextBlock = block.nextConnection && block.nextConnection.targetBlock();
-    return this.blockToCode(nextBlock);
+    return this.blockToCode(block.getNextBlock());
   }
 
   var func = this[block.type];
@@ -138,11 +159,20 @@ Blockly.Generator.prototype.blockToCode = function(block) {
   // The current prefered method of accessing the block is through the second
   // argument to func.call, which becomes the first parameter to the generator.
   var code = func.call(block, block);
-  if (code instanceof Array) {
+  if (goog.isArray(code)) {
     // Value blocks return tuples of code and operator order.
     return [this.scrub_(block, code[0]), code[1]];
-  } else {
+  } else if (goog.isString(code)) {
+    if (this.STATEMENT_PREFIX) {
+      code = this.STATEMENT_PREFIX.replace(/%1/g, '\'' + block.id + '\'') +
+          code;
+    }
     return this.scrub_(block, code);
+  } else if (code === null) {
+    // Block has handled code generation itself.
+    return '';
+  } else {
+    throw 'Invalid code generated: ' + code;
   }
 };
 
@@ -168,7 +198,7 @@ Blockly.Generator.prototype.valueToCode = function(block, name, order) {
     // Disabled block.
     return '';
   }
-  if (!(tuple instanceof Array)) {
+  if (!goog.isArray(tuple)) {
     // Value blocks must return code and order of operations info.
     // Statement blocks must only return code.
     throw 'Expecting tuple from value block "' + targetBlock.type + '".';
@@ -210,10 +240,34 @@ Blockly.Generator.prototype.statementToCode = function(block, name) {
     throw 'Expecting code from statement block "' + targetBlock.type + '".';
   }
   if (code) {
-    code = this.prefixLines(/** @type {string} */ (code), '  ');
+    code = this.prefixLines(/** @type {string} */ (code), this.INDENT);
   }
   return code;
 };
+
+/**
+ * Add an infinite loop trap to the contents of a loop.
+ * If loop is empty, add a statment prefix for the loop block.
+ * @param {string} branch Code for loop contents.
+ * @param {string} id ID of enclosing block.
+ * @return {string} Loop contents, with infinite loop trap added.
+ */
+Blockly.Generator.prototype.addLoopTrap = function(branch, id) {
+  if (this.INFINITE_LOOP_TRAP) {
+    branch = this.INFINITE_LOOP_TRAP.replace(/%1/g, '\'' + id + '\'') + branch;
+  }
+  if (this.STATEMENT_PREFIX) {
+    branch += this.prefixLines(this.STATEMENT_PREFIX.replace(/%1/g,
+        '\'' + id + '\''), this.INDENT);
+  }
+  return branch;
+};
+
+/**
+ * The method of indenting.  Defaults to two spaces, but language generators
+ * may override this to increase indent or change to tabs.
+ */
+Blockly.Generator.prototype.INDENT = '  ';
 
 /**
  * Add one or more words to the list of reserved words for this language.
@@ -229,10 +283,9 @@ Blockly.Generator.prototype.addReservedWords = function(words) {
  * Blockly.Generator.provideFunction_.  It must not be legal code that could
  * legitimately appear in a function definition (or comment), and it must
  * not confuse the regular expression parser.
+ * @private
  */
 Blockly.Generator.prototype.FUNCTION_NAME_PLACEHOLDER_ = '{leCUI8hutHZI4480Dc}';
-Blockly.Generator.prototype.FUNCTION_NAME_PLACEHOLDER_REGEXP_ =
-    new RegExp(Blockly.Generator.prototype.FUNCTION_NAME_PLACEHOLDER_, 'g');
 
 /**
  * Define a function to be included in the generated code.
@@ -246,7 +299,7 @@ Blockly.Generator.prototype.FUNCTION_NAME_PLACEHOLDER_REGEXP_ =
  * The code gets output when Blockly.Generator.finish() is called.
  *
  * @param {string} desiredName The desired name of the function (e.g., isPrime).
- * @param {string} code A list of Python statements.
+ * @param {!Array.<string>} code A list of Python statements.
  * @return {string} The actual name of the new function.  This may differ
  *     from desiredName if the former has already been taken by the user.
  * @private

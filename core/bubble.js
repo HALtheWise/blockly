@@ -1,8 +1,9 @@
 /**
+ * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
- * http://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +27,7 @@
 goog.provide('Blockly.Bubble');
 
 goog.require('Blockly.Workspace');
+goog.require('goog.math');
 
 
 /**
@@ -47,7 +49,7 @@ Blockly.Bubble = function(workspace, content, shape,
   if (Blockly.RTL) {
     angle = -angle;
   }
-  this.arrow_radians_ = angle / 360 * Math.PI * 2;
+  this.arrow_radians_ = goog.math.toRadians(angle);
 
   this.workspace_ = workspace;
   this.content_ = content;
@@ -251,7 +253,7 @@ Blockly.Bubble.prototype.bubbleMouseDown_ = function(e) {
     return;
   }
   // Left-click (or middle click)
-  Blockly.setCursorHand_(true);
+  Blockly.Css.setCursor(Blockly.Css.Cursor.CLOSED);
   // Record the starting offset between the current location and the mouse.
   if (Blockly.RTL) {
     this.dragDeltaX = this.relativeLeft_ + e.clientX;
@@ -299,7 +301,7 @@ Blockly.Bubble.prototype.resizeMouseDown_ = function(e) {
     return;
   }
   // Left-click (or middle click)
-  Blockly.setCursorHand_(true);
+  Blockly.Css.setCursor(Blockly.Css.Cursor.CLOSED);
   // Record the starting offset between the current location and the mouse.
   if (Blockly.RTL) {
     this.resizeDeltaWidth = this.width_ + e.clientX;
@@ -373,37 +375,43 @@ Blockly.Bubble.prototype.setAnchorLocation = function(x, y) {
 };
 
 /**
- * Position the bubble so that it does not fall offscreen.
+ * Position the bubble so that it does not fall off-screen.
  * @private
  */
 Blockly.Bubble.prototype.layoutBubble_ = function() {
   // Compute the preferred bubble location.
   var relativeLeft = -this.width_ / 4;
   var relativeTop = -this.height_ - Blockly.BlockSvg.MIN_BLOCK_Y;
-  // Prevent the bubble from being offscreen.
-  if (this.workspace_.scrollbar) {
-    // Fetch the workspace's metrics, if they exist.
-    var metrics = this.workspace_.getMetrics();
-    if (this.anchorX_ + relativeLeft <
-        Blockly.BlockSvg.SEP_SPACE_X + metrics.viewLeft) {
+  // Prevent the bubble from being off-screen.
+  var metrics = this.workspace_.getMetrics();
+  if (Blockly.RTL) {
+    if (this.anchorX_ - metrics.viewLeft - relativeLeft - this.width_ <
+        Blockly.Scrollbar.scrollbarThickness) {
       // Slide the bubble right until it is onscreen.
-      relativeLeft = Blockly.BlockSvg.SEP_SPACE_X + metrics.viewLeft -
-          this.anchorX_;
+      relativeLeft = this.anchorX_ - metrics.viewLeft - this.width_ -
+        Blockly.Scrollbar.scrollbarThickness;
+    } else if (this.anchorX_ - metrics.viewLeft - relativeLeft >
+               metrics.viewWidth) {
+      // Slide the bubble left until it is onscreen.
+      relativeLeft = this.anchorX_ - metrics.viewLeft - metrics.viewWidth;
+    }
+  } else {
+    if (this.anchorX_ + relativeLeft < metrics.viewLeft) {
+      // Slide the bubble right until it is onscreen.
+      relativeLeft = metrics.viewLeft - this.anchorX_;
     } else if (metrics.viewLeft + metrics.viewWidth <
         this.anchorX_ + relativeLeft + this.width_ +
         Blockly.BlockSvg.SEP_SPACE_X +
         Blockly.Scrollbar.scrollbarThickness) {
       // Slide the bubble left until it is onscreen.
       relativeLeft = metrics.viewLeft + metrics.viewWidth - this.anchorX_ -
-          this.width_ - Blockly.BlockSvg.SEP_SPACE_X -
-          Blockly.Scrollbar.scrollbarThickness;
+          this.width_ - Blockly.Scrollbar.scrollbarThickness;
     }
-    if (this.anchorY_ + relativeTop <
-        Blockly.BlockSvg.SEP_SPACE_Y + metrics.viewTop) {
-      // Slide the bubble below the block.
-      var bBox = /** @type {SVGLocatable} */ (this.shape_).getBBox();
-      relativeTop = bBox.height;
-    }
+  }
+  if (this.anchorY_ + relativeTop < metrics.viewTop) {
+    // Slide the bubble below the block.
+    var bBox = /** @type {SVGLocatable} */ (this.shape_).getBBox();
+    relativeTop = bBox.height;
   }
   this.relativeLeft_ = relativeLeft;
   this.relativeTop_ = relativeTop;
