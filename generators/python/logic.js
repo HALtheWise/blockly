@@ -1,8 +1,9 @@
 /**
+ * @license
  * Visual Blocks Language
  *
  * Copyright 2012 Google Inc.
- * http://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,16 +34,19 @@ Blockly.Python['controls_if'] = function(block) {
   var n = 0;
   var argument = Blockly.Python.valueToCode(block, 'IF' + n,
       Blockly.Python.ORDER_NONE) || 'False';
-  var branch = Blockly.Python.statementToCode(block, 'DO' + n) || '  pass\n';
+  var branch = Blockly.Python.statementToCode(block, 'DO' + n) ||
+      Blockly.Python.PASS;
   var code = 'if ' + argument + ':\n' + branch;
   for (n = 1; n <= block.elseifCount_; n++) {
     argument = Blockly.Python.valueToCode(block, 'IF' + n,
         Blockly.Python.ORDER_NONE) || 'False';
-    branch = Blockly.Python.statementToCode(block, 'DO' + n) || '  pass\n';
+    branch = Blockly.Python.statementToCode(block, 'DO' + n) ||
+        Blockly.Python.PASS;
     code += 'elif ' + argument + ':\n' + branch;
   }
   if (block.elseCount_) {
-    branch = Blockly.Python.statementToCode(block, 'ELSE') || '  pass\n';
+    branch = Blockly.Python.statementToCode(block, 'ELSE') ||
+        Blockly.Python.PASS;
     code += 'else:\n' + branch;
   }
   return code;
@@ -51,12 +55,12 @@ Blockly.Python['controls_if'] = function(block) {
 Blockly.Python['logic_compare'] = function(block) {
   // Comparison operator.
   var OPERATORS = {
-    EQ: '==',
-    NEQ: '!=',
-    LT: '<',
-    LTE: '<=',
-    GT: '>',
-    GTE: '>='
+    'EQ': '==',
+    'NEQ': '!=',
+    'LT': '<',
+    'LTE': '<=',
+    'GT': '>',
+    'GTE': '>='
   };
   var operator = OPERATORS[block.getFieldValue('OP')];
   var order = Blockly.Python.ORDER_RELATIONAL;
@@ -118,6 +122,6 @@ Blockly.Python['logic_ternary'] = function(block) {
       Blockly.Python.ORDER_CONDITIONAL) || 'None';
   var value_else = Blockly.Python.valueToCode(block, 'ELSE',
       Blockly.Python.ORDER_CONDITIONAL) || 'None';
-  var code = value_then + ' if ' + value_if + ' else ' + value_else
+  var code = value_then + ' if ' + value_if + ' else ' + value_else;
   return [code, Blockly.Python.ORDER_CONDITIONAL];
 };

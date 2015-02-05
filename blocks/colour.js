@@ -1,8 +1,9 @@
 /**
+ * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
- * http://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +29,16 @@ goog.provide('Blockly.Blocks.colour');
 goog.require('Blockly.Blocks');
 
 
+Blockly.Blocks.colour.HUE = 20;
+
 Blockly.Blocks['colour_picker'] = {
-  // Colour picker.
+  /**
+   * Block for colour picker.
+   * @this Blockly.Block
+   */
   init: function() {
     this.setHelpUrl(Blockly.Msg.COLOUR_PICKER_HELPURL);
-    this.setColour(20);
+    this.setColour(Blockly.Blocks.colour.HUE);
     this.appendDummyInput()
         .appendField(new Blockly.FieldColour('#ff0000'), 'COLOUR');
     this.setOutput(true, 'Colour');
@@ -41,10 +47,13 @@ Blockly.Blocks['colour_picker'] = {
 };
 
 Blockly.Blocks['colour_random'] = {
-  // Random colour.
+  /**
+   * Block for random colour.
+   * @this Blockly.Block
+   */
   init: function() {
     this.setHelpUrl(Blockly.Msg.COLOUR_RANDOM_HELPURL);
-    this.setColour(20);
+    this.setColour(Blockly.Blocks.colour.HUE);
     this.appendDummyInput()
         .appendField(Blockly.Msg.COLOUR_RANDOM_TITLE);
     this.setOutput(true, 'Colour');
@@ -53,10 +62,13 @@ Blockly.Blocks['colour_random'] = {
 };
 
 Blockly.Blocks['colour_rgb'] = {
-  // Compose a colour from RGB components.
+  /**
+   * Block for composing a colour from RGB components.
+   * @this Blockly.Block
+   */
   init: function() {
     this.setHelpUrl(Blockly.Msg.COLOUR_RGB_HELPURL);
-    this.setColour(20);
+    this.setColour(Blockly.Blocks.colour.HUE);
     this.appendValueInput('RED')
         .setCheck('Number')
         .setAlign(Blockly.ALIGN_RIGHT)
@@ -76,10 +88,13 @@ Blockly.Blocks['colour_rgb'] = {
 };
 
 Blockly.Blocks['colour_blend'] = {
-  // Blend two colours together.
+  /**
+   * Block for blending two colours together.
+   * @this Blockly.Block
+   */
   init: function() {
     this.setHelpUrl(Blockly.Msg.COLOUR_BLEND_HELPURL);
-    this.setColour(20);
+    this.setColour(Blockly.Blocks.colour.HUE);
     this.appendValueInput('COLOUR1')
         .setCheck('Colour')
         .setAlign(Blockly.ALIGN_RIGHT)

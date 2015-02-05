@@ -1,8 +1,9 @@
 /**
+ * @license
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
- * http://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +29,16 @@ goog.provide('Blockly.Blocks.loops');
 goog.require('Blockly.Blocks');
 
 
+Blockly.Blocks.loops.HUE = 120;
+
 Blockly.Blocks['controls_repeat'] = {
-  // Repeat n times (internal number).
+  /**
+   * Block for repeat n times (internal number).
+   * @this Blockly.Block
+   */
   init: function() {
     this.setHelpUrl(Blockly.Msg.CONTROLS_REPEAT_HELPURL);
-    this.setColour(120);
+    this.setColour(Blockly.Blocks.loops.HUE);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CONTROLS_REPEAT_TITLE_REPEAT)
         .appendField(new Blockly.FieldTextInput('10',
@@ -47,10 +53,13 @@ Blockly.Blocks['controls_repeat'] = {
 };
 
 Blockly.Blocks['controls_repeat_ext'] = {
-  // Repeat n times (external number).
+  /**
+   * Block for repeat n times (external number).
+   * @this Blockly.Block
+   */
   init: function() {
     this.setHelpUrl(Blockly.Msg.CONTROLS_REPEAT_HELPURL);
-    this.setColour(120);
+    this.setColour(Blockly.Blocks.loops.HUE);
     this.interpolateMsg(Blockly.Msg.CONTROLS_REPEAT_TITLE,
                         ['TIMES', 'Number', Blockly.ALIGN_RIGHT],
                         Blockly.ALIGN_RIGHT);
@@ -64,13 +73,16 @@ Blockly.Blocks['controls_repeat_ext'] = {
 };
 
 Blockly.Blocks['controls_whileUntil'] = {
-  // Do while/until loop.
+  /**
+   * Block for 'do while/until' loop.
+   * @this Blockly.Block
+   */
   init: function() {
     var OPERATORS =
         [[Blockly.Msg.CONTROLS_WHILEUNTIL_OPERATOR_WHILE, 'WHILE'],
          [Blockly.Msg.CONTROLS_WHILEUNTIL_OPERATOR_UNTIL, 'UNTIL']];
     this.setHelpUrl(Blockly.Msg.CONTROLS_WHILEUNTIL_HELPURL);
-    this.setColour(120);
+    this.setColour(Blockly.Blocks.loops.HUE);
     this.appendValueInput('BOOL')
         .setCheck('Boolean')
         .appendField(new Blockly.FieldDropdown(OPERATORS), 'MODE');
@@ -83,8 +95,8 @@ Blockly.Blocks['controls_whileUntil'] = {
     this.setTooltip(function() {
       var op = thisBlock.getFieldValue('MODE');
       var TOOLTIPS = {
-        WHILE: Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE,
-        UNTIL: Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL
+        'WHILE': Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_WHILE,
+        'UNTIL': Blockly.Msg.CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL
       };
       return TOOLTIPS[op];
     });
@@ -92,10 +104,13 @@ Blockly.Blocks['controls_whileUntil'] = {
 };
 
 Blockly.Blocks['controls_for'] = {
-  // For loop.
+  /**
+   * Block for 'for' loop.
+   * @this Blockly.Block
+   */
   init: function() {
     this.setHelpUrl(Blockly.Msg.CONTROLS_FOR_HELPURL);
-    this.setColour(120);
+    this.setColour(Blockly.Blocks.loops.HUE);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CONTROLS_FOR_INPUT_WITH)
         .appendField(new Blockly.FieldVariable(null), 'VAR');
@@ -116,32 +131,54 @@ Blockly.Blocks['controls_for'] = {
           thisBlock.getFieldValue('VAR'));
     });
   },
+  /**
+   * Return all variables referenced by this block.
+   * @return {!Array.<string>} List of variable names.
+   * @this Blockly.Block
+   */
   getVars: function() {
     return [this.getFieldValue('VAR')];
   },
+  /**
+   * Notification that a variable is renaming.
+   * If the name matches one of this block's variables, rename it.
+   * @param {string} oldName Previous name of variable.
+   * @param {string} newName Renamed variable.
+   * @this Blockly.Block
+   */
   renameVar: function(oldName, newName) {
     if (Blockly.Names.equals(oldName, this.getFieldValue('VAR'))) {
       this.setFieldValue(newName, 'VAR');
     }
   },
+  /**
+   * Add menu option to create getter block for loop variable.
+   * @param {!Array} options List of menu options to add to.
+   * @this Blockly.Block
+   */
   customContextMenu: function(options) {
-    var option = {enabled: true};
-    var name = this.getFieldValue('VAR');
-    option.text = Blockly.Msg.VARIABLES_SET_CREATE_GET.replace('%1', name);
-    var xmlField = goog.dom.createDom('field', null, name);
-    xmlField.setAttribute('name', 'VAR');
-    var xmlBlock = goog.dom.createDom('block', null, xmlField);
-    xmlBlock.setAttribute('type', 'variables_get');
-    option.callback = Blockly.ContextMenu.callbackFactory(this, xmlBlock);
-    options.push(option);
+    if (!this.isCollapsed()) {
+      var option = {enabled: true};
+      var name = this.getFieldValue('VAR');
+      option.text = Blockly.Msg.VARIABLES_SET_CREATE_GET.replace('%1', name);
+      var xmlField = goog.dom.createDom('field', null, name);
+      xmlField.setAttribute('name', 'VAR');
+      var xmlBlock = goog.dom.createDom('block', null, xmlField);
+      xmlBlock.setAttribute('type', 'variables_get');
+      option.callback = Blockly.ContextMenu.callbackFactory(this, xmlBlock);
+      options.push(option);
+    }
   }
 };
 
 Blockly.Blocks['controls_forEach'] = {
-  // For each loop.
+  /**
+   * Block for 'for each' loop.
+   * @this Blockly.Block
+   */
   init: function() {
     this.setHelpUrl(Blockly.Msg.CONTROLS_FOREACH_HELPURL);
-    this.setColour(120);
+    this.setColour(Blockly.Blocks.loops.HUE);
     this.appendValueInput('LIST')
         .setCheck('Array')
         .appendField(Blockly.Msg.CONTROLS_FOREACH_INPUT_ITEM)
@@ -163,9 +200,21 @@ Blockly.Blocks['controls_forEach'] = {
           thisBlock.getFieldValue('VAR'));
     });
   },
+  /**
+   * Return all variables referenced by this block.
+   * @return {!Array.<string>} List of variable names.
+   * @this Blockly.Block
+   */
   getVars: function() {
     return [this.getFieldValue('VAR')];
   },
+  /**
+   * Notification that a variable is renaming.
+   * If the name matches one of this block's variables, rename it.
+   * @param {string} oldName Previous name of variable.
+   * @param {string} newName Renamed variable.
+   * @this Blockly.Block
+   */
   renameVar: function(oldName, newName) {
     if (Blockly.Names.equals(oldName, this.getFieldValue('VAR'))) {
       this.setFieldValue(newName, 'VAR');
@@ -175,13 +224,16 @@ Blockly.Blocks['controls_forEach'] = {
 };
 
 Blockly.Blocks['controls_flow_statements'] = {
-  // Flow statements: continue, break.
+  /**
+   * Block for flow statements: continue, break.
+   * @this Blockly.Block
+   */
   init: function() {
     var OPERATORS =
         [[Blockly.Msg.CONTROLS_FLOW_STATEMENTS_OPERATOR_BREAK, 'BREAK'],
          [Blockly.Msg.CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE, 'CONTINUE']];
     this.setHelpUrl(Blockly.Msg.CONTROLS_FLOW_STATEMENTS_HELPURL);
-    this.setColour(120);
+    this.setColour(Blockly.Blocks.loops.HUE);
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(OPERATORS), 'FLOW');
     this.setPreviousStatement(true);
@@ -190,12 +242,17 @@ Blockly.Blocks['controls_flow_statements'] = {
     this.setTooltip(function() {
       var op = thisBlock.getFieldValue('FLOW');
       var TOOLTIPS = {
-        BREAK: Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_BREAK,
-        CONTINUE: Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_CONTINUE
+        'BREAK': Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_BREAK,
+        'CONTINUE': Blockly.Msg.CONTROLS_FLOW_STATEMENTS_TOOLTIP_CONTINUE
       };
-      return thisBlock.TOOLTIPS[op];
+      return TOOLTIPS[op];
     });
   },
+  /**
+   * Called whenever anything on the workspace changes.
+   * Add warning if this flow block is not nested inside a loop.
+   * @this Blockly.Block
+   */
   onchange: function() {
     if (!this.workspace) {
       // Block has been deleted.

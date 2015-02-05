@@ -1,8 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/python2.7
 # Compresses the core Blockly files into a single JavaScript file.
 #
 # Copyright 2012 Google Inc.
-# http://blockly.googlecode.com/
+# https://developers.google.com/blockly/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
 
 import errno, glob, httplib, json, os, re, subprocess, sys, threading, urllib
 
+
 def import_path(fullpath):
   """Import a file with full path specification.
   Allows one to import from any directory, something __import__ does not do.
@@ -51,7 +52,7 @@ def import_path(fullpath):
   filename, ext = os.path.splitext(filename)
   sys.path.append(path)
   module = __import__(filename)
-  reload(module) # Might be out of date
+  reload(module)  # Might be out of date.
   del sys.path[-1]
   return module
 
@@ -91,7 +92,7 @@ window.BLOCKLY_BOOT = function() {
 // Execute after Closure has loaded.
 if (!window.goog) {
   alert('Error: Closure not found.  Read this:\\n' +
-        'http://code.google.com/p/blockly/wiki/Closure\\n');
+        'developers.google.com/blockly/hacking/closure');
 }
 
 // Build map of all dependencies (used and unused).
@@ -108,9 +109,6 @@ var dir = window.BLOCKLY_DIR.match(/[^\\/]+$/)[0];
     m = re.search('[\\/]([^\\/]+)[\\/]core[\\/]blockly.js', add_dependency)
     add_dependency = re.sub('([\\/])' + re.escape(m.group(1)) +
         '([\\/]core[\\/])', '\\1" + dir + "\\2', add_dependency)
-    m = re.search('[\\/]([^\\/]+)[\\/]realtime[\\/]realtime.js', add_dependency)
-    add_dependency = re.sub('([\\/])' + re.escape(m.group(1)) +
-        '([\\/]realtime[\\/])', '\\1" + dir + "\\2', add_dependency)
     f.write(add_dependency + '\n')
 
     provides = []
@@ -129,11 +127,11 @@ delete window.BLOCKLY_BOOT;
 };
 
 // Delete any existing Closure (e.g. Soy's nogoog_shim).
-document.write('<script type="text/javascript">var goog = undefined;</script>');
+document.write('<script>var goog = undefined;</script>');
 // Load fresh Closure Library.
-document.write('<script type="text/javascript" src="' + window.BLOCKLY_DIR +
-    '/../closure-library-read-only/closure/goog/base.js"></script>');
-document.write('<script type="text/javascript">window.BLOCKLY_BOOT()</script>');
+document.write('<script src="' + window.BLOCKLY_DIR +
+    '/../closure-library/closure/goog/base.js"></script>');
+document.write('<script>window.BLOCKLY_BOOT()</script>');
 """)
     f.close()
     print('SUCCESS: ' + target_filename)
@@ -196,7 +194,7 @@ class Gen_compressed(threading.Thread):
 
     # Read in all the source files.
     # Add Blockly.Blocks to be compatible with the compiler.
-    params.append(('js_code', "goog.provide('Blockly.Blocks');"))
+    params.append(('js_code', 'goog.provide(\'Blockly.Blocks\');'))
     filenames = glob.glob(os.path.join('blocks', '*.js'))
     for filename in filenames:
       f = open(filename)
@@ -204,7 +202,7 @@ class Gen_compressed(threading.Thread):
       f.close()
 
     # Remove Blockly.Blocks to be compatible with Blockly.
-    remove = "var Blockly={Blocks:{}};"
+    remove = 'var Blockly={Blocks:{}};'
     self.do_compile(params, target_filename, filenames, remove)
 
   def gen_generator(self, language):
@@ -221,7 +219,7 @@ class Gen_compressed(threading.Thread):
 
     # Read in all the source files.
     # Add Blockly.Generator to be compatible with the compiler.
-    params.append(('js_code', "goog.provide('Blockly.Generator');"))
+    params.append(('js_code', 'goog.provide(\'Blockly.Generator\');'))
     filenames = glob.glob(
         os.path.join('generators', language, '*.js'))
     filenames.insert(0, os.path.join('generators', language + '.js'))
@@ -232,12 +230,12 @@ class Gen_compressed(threading.Thread):
     filenames.insert(0, '[goog.provide]')
 
     # Remove Blockly.Generator to be compatible with Blockly.
-    remove = "var Blockly={Generator:{}};"
+    remove = 'var Blockly={Generator:{}};'
     self.do_compile(params, target_filename, filenames, remove)
 
   def do_compile(self, params, target_filename, filenames, remove):
     # Send the request to Google.
-    headers = { "Content-type": "application/x-www-form-urlencoded" }
+    headers = {'Content-type': 'application/x-www-form-urlencoded'}
     conn = httplib.HTTPConnection('closure-compiler.appspot.com')
     conn.request('POST', '/compile', urllib.urlencode(params), headers)
     response = conn.getresponse()
@@ -256,17 +254,18 @@ class Gen_compressed(threading.Thread):
     if json_data.has_key('serverErrors'):
       errors = json_data['serverErrors']
       for error in errors:
-        print 'SERVER ERROR: %s' % target_filename
-        print error['error']
+        print('SERVER ERROR: %s' % target_filename)
+        print(error['error'])
     elif json_data.has_key('errors'):
       errors = json_data['errors']
       for error in errors:
         print('FATAL ERROR')
         print(error['error'])
-        print('%s at line %d:' % (
-            file_lookup(error['file']), error['lineno']))
-        print(error['line'])
-        print((' ' * error['charno']) + '^')
+        if error['file']:
+          print('%s at line %d:' % (
+              file_lookup(error['file']), error['lineno']))
+          print(error['line'])
+          print((' ' * error['charno']) + '^')
         sys.exit(1)
     else:
       if json_data.has_key('warnings'):
@@ -274,10 +273,11 @@ class Gen_compressed(threading.Thread):
         for warning in warnings:
           print('WARNING')
           print(warning['warning'])
-          print('%s at line %d:' % (
-              file_lookup(warning['file']), warning['lineno']))
-          print(warning['line'])
-          print((' ' * warning['charno']) + '^')
+          if warning['file']:
+            print('%s at line %d:' % (
+                file_lookup(warning['file']), warning['lineno']))
+            print(warning['line'])
+            print((' ' * warning['charno']) + '^')
         print()
 
       if not json_data.has_key('compiledCode'):
@@ -286,6 +286,28 @@ class Gen_compressed(threading.Thread):
 
       code = HEADER + '\n' + json_data['compiledCode']
       code = code.replace(remove, '')
+
+      # Trim down Google's Apache licences.
+      LICENSE = re.compile("""/\\*
+
+ [\w ]+
+
+ (Copyright \\d+ Google Inc.)
+ https://developers.google.com/blockly/
+
+ Licensed under the Apache License, Version 2.0 \(the "License"\);
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+\\*/""")
+      code = re.sub(LICENSE, r'\n// \1  Apache License 2.0', code)
 
       stats = json_data['statistics']
       original_b = stats['originalSize']
@@ -302,7 +324,7 @@ class Gen_compressed(threading.Thread):
         print('Size changed from %d KB to %d KB (%d%%).' % (
             original_kb, compressed_kb, ratio))
       else:
-        print 'UNKNOWN ERROR'
+        print('UNKNOWN ERROR')
 
 
 class Gen_langfiles(threading.Thread):
@@ -319,7 +341,7 @@ class Gen_langfiles(threading.Thread):
     try:
       return (max(os.path.getmtime(src) for src in srcs) >
               min(os.path.getmtime(dest) for dest in dests))
-    except OSError, e:
+    except OSError as e:
       # Was a file not found?
       if e.errno == errno.ENOENT:
         # If it was a source file, we can't proceed.
@@ -339,11 +361,12 @@ class Gen_langfiles(threading.Thread):
                       ['en.json', 'qqq.json', 'synonyms.json']]):
       try:
         subprocess.check_call([
+            'python',
             os.path.join('i18n', 'js_to_json.py'),
             '--input_file', 'msg/messages.js',
             '--output_dir', 'msg/json/',
             '--quiet'])
-      except (subprocess.CalledProcessError, OSError), e:
+      except (subprocess.CalledProcessError, OSError) as e:
         # Documentation for subprocess.check_call says that CalledProcessError
         # will be raised on failure, but I found that OSError is also possible.
         print('Error running i18n/js_to_json.py: ', e)
@@ -355,6 +378,7 @@ class Gen_langfiles(threading.Thread):
     try:
       # Use create_messages.py to create .js files from .json files.
       cmd = [
+          'python',
           os.path.join('i18n', 'create_messages.py'),
           '--source_lang_file', os.path.join('msg', 'json', 'en.json'),
           '--source_synonym_file', os.path.join('msg', 'json', 'synonyms.json'),
@@ -366,7 +390,7 @@ class Gen_langfiles(threading.Thread):
                     (file.endswith(('keys.json', 'synonyms.json', 'qqq.json')))]
       cmd.extend(json_files)
       subprocess.check_call(cmd)
-    except (subprocess.CalledProcessError, OSError), e:
+    except (subprocess.CalledProcessError, OSError) as e:
       print('Error running i18n/create_messages.py: ', e)
       sys.exit(1)
 
@@ -383,13 +407,19 @@ class Gen_langfiles(threading.Thread):
 if __name__ == '__main__':
   try:
     calcdeps = import_path(os.path.join(os.path.pardir,
-          'closure-library-read-only', 'closure', 'bin', 'calcdeps.py'))
+        'closure-library', 'closure', 'bin', 'calcdeps.py'))
   except ImportError:
-    print("""Error: Closure not found.  Read this:
-http://code.google.com/p/blockly/wiki/Closure""")
+    if os.path.isdir(os.path.join(os.path.pardir, 'closure-library-read-only')):
+      # Dir got renamed when Closure moved from Google Code to GitHub in 2014.
+      print("Error: Closure directory needs to be renamed from"
+            "'closure-library-read-only' to 'closure-library'.\n"
+            "Please rename this directory.")
+    else:
+      print("""Error: Closure not found.  Read this:
+https://developers.google.com/blockly/hacking/closure""")
     sys.exit(1)
   search_paths = calcdeps.ExpandDirectories(
-      ['core', 'realtime', os.path.join(os.path.pardir, 'closure-library-read-only')])
+      ['core', os.path.join(os.path.pardir, 'closure-library')])
 
   # Run both tasks in parallel threads.
   # Uncompressed is limited by processor speed.
