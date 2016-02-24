@@ -66,6 +66,7 @@ Code.LANGUAGE_NAME = {
   'sk': 'Slovenčina',
   'sr': 'Српски',
   'sv': 'Svenska',
+  'ta': 'தமிழ்',
   'th': 'ภาษาไทย',
   'tlh': 'tlhIngan Hol',
   'tr': 'Türkçe',
@@ -78,7 +79,13 @@ Code.LANGUAGE_NAME = {
 /**
  * List of RTL languages.
  */
-Code.LANGUAGE_RTL = ['ar', 'fa', 'he'];
+Code.LANGUAGE_RTL = ['ar', 'fa', 'he', 'lki'];
+
+/**
+ * Blockly's main workspace.
+ * @type {Blockly.WorkspaceSvg}
+ */
+Code.workspace = null;
 
 /**
  * Extracts a parameter from the URL.
@@ -132,11 +139,11 @@ Code.loadBlocks = function(defaultXml) {
     // Language switching stores the blocks during the reload.
     delete window.sessionStorage.loadOnceBlocks;
     var xml = Blockly.Xml.textToDom(loadOnce);
-    Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+    Blockly.Xml.domToWorkspace(Code.workspace, xml);
   } else if (defaultXml) {
     // Load the editor with default starting blocks.
     var xml = Blockly.Xml.textToDom(defaultXml);
-    Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+    Blockly.Xml.domToWorkspace(Code.workspace, xml);
   } else if ('BlocklyStorage' in window) {
     // Restore saved blocks in a separate thread so that subsequent
     // initialization is not affected from a failed load.
@@ -153,7 +160,7 @@ Code.changeLanguage = function() {
   // not load Blockly.
   // MSIE 11 does not support sessionStorage on file:// URLs.
   if (typeof Blockly != 'undefined' && window.sessionStorage) {
-    var xml = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+    var xml = Blockly.Xml.workspaceToDom(Code.workspace);
     var text = Blockly.Xml.domToText(xml);
     window.sessionStorage.loadOnceBlocks = text;
   }
@@ -229,7 +236,7 @@ Code.getBBox_ = function(element) {
 
 /**
  * User's language (e.g. "en").
- * @type string
+ * @type {string}
  */
 Code.LANG = Code.getLang();
 
@@ -237,7 +244,7 @@ Code.LANG = Code.getLang();
  * List of tab names.
  * @private
  */
-Code.TABS_ = ['blocks', 'javascript', 'python', 'dart', 'xml'];
+Code.TABS_ = ['blocks', 'javascript', 'php', 'python', 'dart', 'xml'];
 
 Code.selected = 'blocks';
 
@@ -262,11 +269,14 @@ Code.tabClick = function(clickedName) {
       }
     }
     if (xmlDom) {
-      Blockly.mainWorkspace.clear();
-      Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xmlDom);
+      Code.workspace.clear();
+      Blockly.Xml.domToWorkspace(Code.workspace, xmlDom);
     }
   }
 
+  if (document.getElementById('tab_blocks').className == 'tabon') {
+    Code.workspace.setVisible(false);
+  }
   // Deselect all tabs and hide all panes.
   for (var i = 0; i < Code.TABS_.length; i++) {
     var name = Code.TABS_[i];
@@ -281,6 +291,9 @@ Code.tabClick = function(clickedName) {
   document.getElementById('content_' + clickedName).style.visibility =
       'visible';
   Code.renderContent();
+  if (clickedName == 'blocks') {
+    Code.workspace.setVisible(true);
+  }
   Blockly.fireUiEvent(window, 'resize');
 };
 
@@ -292,12 +305,12 @@ Code.renderContent = function() {
   // Initialize the pane.
   if (content.id == 'content_xml') {
     var xmlTextarea = document.getElementById('content_xml');
-    var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+    var xmlDom = Blockly.Xml.workspaceToDom(Code.workspace);
     var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
     xmlTextarea.value = xmlText;
     xmlTextarea.focus();
   } else if (content.id == 'content_javascript') {
-    var code = Blockly.JavaScript.workspaceToCode();
+    var code = Blockly.JavaScript.workspaceToCode(Code.workspace);
     content.textContent = code;
     if (typeof prettyPrintOne == 'function') {
       code = content.innerHTML;
@@ -305,15 +318,23 @@ Code.renderContent = function() {
       content.innerHTML = code;
     }
   } else if (content.id == 'content_python') {
-    code = Blockly.Python.workspaceToCode();
+    code = Blockly.Python.workspaceToCode(Code.workspace);
     content.textContent = code;
     if (typeof prettyPrintOne == 'function') {
       code = content.innerHTML;
       code = prettyPrintOne(code, 'py');
       content.innerHTML = code;
     }
+  } else if (content.id == 'content_php') {
+    code = Blockly.PHP.workspaceToCode(Code.workspace);
+    content.textContent = code;
+    if (typeof prettyPrintOne == 'function') {
+      code = content.innerHTML;
+      code = prettyPrintOne(code, 'php');
+      content.innerHTML = code;
+    }
   } else if (content.id == 'content_dart') {
-    code = Blockly.Dart.workspaceToCode();
+    code = Blockly.Dart.workspaceToCode(Code.workspace);
     content.textContent = code;
     if (typeof prettyPrintOne == 'function') {
       code = content.innerHTML;
@@ -328,18 +349,6 @@ Code.renderContent = function() {
  */
 Code.init = function() {
   Code.initLanguage();
-
-  // Disable the link button if page isn't backed by App Engine storage.
-  var linkButton = document.getElementById('linkButton');
-  if ('BlocklyStorage' in window) {
-    BlocklyStorage['HTTPREQUEST_ERROR'] = MSG['httpRequestError'];
-    BlocklyStorage['LINK_ALERT'] = MSG['linkAlert'];
-    BlocklyStorage['HASH_ERROR'] = MSG['hashError'];
-    BlocklyStorage['XML_ERROR'] = MSG['xmlError'];
-    Code.bindClick(linkButton, BlocklyStorage.link);
-  } else if (linkButton) {
-    linkButton.className = 'disabled';
-  }
 
   var rtl = Code.isRtl();
   var container = document.getElementById('content_area');
@@ -357,21 +366,31 @@ Code.init = function() {
       el.style.width = (2 * bBox.width - el.offsetWidth) + 'px';
     }
     // Make the 'Blocks' tab line up with the toolbox.
-    if (Blockly.mainWorkspace.toolbox_.width) {
+    if (Code.workspace && Code.workspace.toolbox_.width) {
       document.getElementById('tab_blocks').style.minWidth =
-          (Blockly.mainWorkspace.toolbox_.width - 38) + 'px';
+          (Code.workspace.toolbox_.width - 38) + 'px';
           // Account for the 19 pixel margin and on each side.
     }
   };
+  onresize();
   window.addEventListener('resize', onresize, false);
 
   var toolbox = document.getElementById('toolbox');
-  Blockly.inject(document.getElementById('content_blocks'),
-      {media: '../../media/',
+  Code.workspace = Blockly.inject('content_blocks',
+      {grid:
+          {spacing: 25,
+           length: 3,
+           colour: '#ccc',
+           snap: true},
+       media: '../../media/',
        rtl: rtl,
-       toolbox: toolbox});
+       toolbox: toolbox,
+       zoom:
+           {controls: true,
+            wheel: true}
+      });
 
-  // Add to reserved word list: Local variables in execution evironment (runJS)
+  // Add to reserved word list: Local variables in execution environment (runJS)
   // and the infinite loop detection function.
   Blockly.JavaScript.addReservedWords('code,timeouts,checkTimeout');
 
@@ -379,15 +398,26 @@ Code.init = function() {
 
   if ('BlocklyStorage' in window) {
     // Hook a save function onto unload.
-    BlocklyStorage.backupOnUnload();
+    BlocklyStorage.backupOnUnload(Code.workspace);
   }
 
   Code.tabClick(Code.selected);
-  Blockly.fireUiEvent(window, 'resize');
 
   Code.bindClick('trashButton',
       function() {Code.discard(); Code.renderContent();});
   Code.bindClick('runButton', Code.runJS);
+  // Disable the link button if page isn't backed by App Engine storage.
+  var linkButton = document.getElementById('linkButton');
+  if ('BlocklyStorage' in window) {
+    BlocklyStorage['HTTPREQUEST_ERROR'] = MSG['httpRequestError'];
+    BlocklyStorage['LINK_ALERT'] = MSG['linkAlert'];
+    BlocklyStorage['HASH_ERROR'] = MSG['hashError'];
+    BlocklyStorage['XML_ERROR'] = MSG['xmlError'];
+    Code.bindClick(linkButton,
+        function() {BlocklyStorage.link(Code.workspace);});
+  } else if (linkButton) {
+    linkButton.className = 'disabled';
+  }
 
   for (var i = 0; i < Code.TABS_.length; i++) {
     var name = Code.TABS_[i];
@@ -404,10 +434,8 @@ Code.init = function() {
  */
 Code.initLanguage = function() {
   // Set the HTML's language and direction.
-  // document.dir fails in Mozilla, use document.body.parentNode.dir instead.
-  // https://bugzilla.mozilla.org/show_bug.cgi?id=151407
   var rtl = Code.isRtl();
-  document.head.parentElement.setAttribute('dir', rtl ? 'rtl' : 'ltr');
+  document.dir = rtl ? 'rtl' : 'ltr';
   document.head.parentElement.setAttribute('lang', Code.LANG);
 
   // Sort languages alphabetically.
@@ -472,7 +500,7 @@ Code.runJS = function() {
       throw MSG['timeout'];
     }
   };
-  var code = Blockly.JavaScript.workspaceToCode();
+  var code = Blockly.JavaScript.workspaceToCode(Code.workspace);
   Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
   try {
     eval(code);
@@ -485,11 +513,13 @@ Code.runJS = function() {
  * Discard all blocks from the workspace.
  */
 Code.discard = function() {
-  var count = Blockly.mainWorkspace.getAllBlocks().length;
+  var count = Code.workspace.getAllBlocks().length;
   if (count < 2 ||
-      window.confirm(MSG['discard'].replace('%1', count))) {
-    Blockly.mainWorkspace.clear();
-    window.location.hash = '';
+      window.confirm(Blockly.Msg.DELETE_ALL_BLOCKS.replace('%1', count))) {
+    Code.workspace.clear();
+    if (window.location.hash) {
+      window.location.hash = '';
+    }
   }
 };
 

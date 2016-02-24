@@ -27,6 +27,8 @@
 goog.provide('Blockly.FieldImage');
 
 goog.require('Blockly.Field');
+goog.require('goog.dom');
+goog.require('goog.math.Size');
 goog.require('goog.userAgent');
 
 
@@ -35,7 +37,7 @@ goog.require('goog.userAgent');
  * @param {string} src The URL of the image.
  * @param {number} width Width of the image.
  * @param {number} height Height of the image.
- * @param {?string} opt_alt Optional alt text for when block is collapsed.
+ * @param {string=} opt_alt Optional alt text for when block is collapsed.
  * @extends {Blockly.Field}
  * @constructor
  */
@@ -44,21 +46,12 @@ Blockly.FieldImage = function(src, width, height, opt_alt) {
   // Ensure height and width are numbers.  Strings are bad at math.
   this.height_ = Number(height);
   this.width_ = Number(width);
-  this.size_ = {height: this.height_ + 10, width: this.width_};
+  this.size_ = new goog.math.Size(this.width_,
+      this.height_ + 2 * Blockly.BlockSvg.INLINE_PADDING_Y);
   this.text_ = opt_alt || '';
   this.setValue(src);
 };
 goog.inherits(Blockly.FieldImage, Blockly.Field);
-
-/**
- * Clone this FieldImage.
- * @return {!Blockly.FieldImage} The result of calling the constructor again
- *   with the current values of the arguments used during construction.
- */
-Blockly.FieldImage.prototype.clone = function() {
-  return new Blockly.FieldImage(this.getSrc(), this.width_, this.height_,
-      this.getText());
-};
 
 /**
  * Rectangular mask used by Firefox.
@@ -83,20 +76,25 @@ Blockly.FieldImage.prototype.init = function(block) {
   }
   this.sourceBlock_ = block;
   // Build the DOM.
-  var offsetY = 6 - Blockly.BlockSvg.FIELD_HEIGHT;
+  /** @type {SVGElement} */
   this.fieldGroup_ = Blockly.createSvgElement('g', {}, null);
+  if (!this.visible_) {
+    this.fieldGroup_.style.display = 'none';
+  }
+  /** @type {SVGElement} */
   this.imageElement_ = Blockly.createSvgElement('image',
       {'height': this.height_ + 'px',
-       'width': this.width_ + 'px',
-       'y': offsetY}, this.fieldGroup_);
+       'width': this.width_ + 'px'}, this.fieldGroup_);
   this.setValue(this.src_);
   if (goog.userAgent.GECKO) {
-    // Due to a Firefox bug which eats mouse events on image elements,
-    // a transparent rectangle needs to be placed on top of the image.
+    /**
+     * Due to a Firefox bug which eats mouse events on image elements,
+     * a transparent rectangle needs to be placed on top of the image.
+     * @type {SVGElement}
+     */
     this.rectElement_ = Blockly.createSvgElement('rect',
         {'height': this.height_ + 'px',
          'width': this.width_ + 'px',
-         'y': offsetY,
          'fill-opacity': 0}, this.fieldGroup_);
   }
   block.getSvgRoot().appendChild(this.fieldGroup_);

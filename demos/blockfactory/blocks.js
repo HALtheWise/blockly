@@ -34,6 +34,7 @@ Blockly.Blocks['factory_base'] = {
         .setCheck('Input')
         .appendField('inputs');
     var dropdown = new Blockly.FieldDropdown([
+        ['automatic inputs', 'AUTO'],
         ['external inputs', 'EXT'],
         ['inline inputs', 'INT']]);
     this.appendDummyInput()
@@ -295,13 +296,11 @@ Blockly.Blocks['field_dropdown'] = {
     }
   },
   decompose: function(workspace) {
-    var containerBlock =
-        Blockly.Block.obtain(workspace, 'field_dropdown_container');
+    var containerBlock = workspace.newBlock('field_dropdown_container');
     containerBlock.initSvg();
     var connection = containerBlock.getInput('STACK').connection;
     for (var x = 0; x < this.optionCount_; x++) {
-      var optionBlock =
-          Blockly.Block.obtain(workspace, 'field_dropdown_option');
+      var optionBlock = workspace.newBlock('field_dropdown_option');
       optionBlock.initSvg();
       connection.connect(optionBlock.previousConnection);
       connection = optionBlock.nextConnection;
@@ -427,6 +426,28 @@ Blockly.Blocks['field_colour'] = {
   }
 };
 
+Blockly.Blocks['field_date'] = {
+  // Date input.
+  init: function() {
+    this.setColour(160);
+    this.appendDummyInput()
+        .appendField('date')
+        .appendField(new Blockly.FieldDate(), 'DATE')
+        .appendField(',')
+        .appendField(new Blockly.FieldTextInput('NAME'), 'FIELDNAME');
+    this.setPreviousStatement(true, 'Field');
+    this.setNextStatement(true, 'Field');
+    this.setTooltip('Date input field.');
+  },
+  onchange: function() {
+    if (!this.workspace) {
+      // Block has been deleted.
+      return;
+    }
+    fieldNameCheck(this);
+  }
+};
+
 Blockly.Blocks['field_variable'] = {
   // Dropdown for variables.
   init: function() {
@@ -510,12 +531,11 @@ Blockly.Blocks['type_group'] = {
     }
   },
   decompose: function(workspace) {
-    var containerBlock =
-        Blockly.Block.obtain(workspace, 'type_group_container');
+    var containerBlock = workspace.newBlock('type_group_container');
     containerBlock.initSvg();
     var connection = containerBlock.getInput('STACK').connection;
     for (var x = 0; x < this.typeCount_; x++) {
-      var typeBlock = Blockly.Block.obtain(workspace, 'type_group_item');
+      var typeBlock = workspace.newBlock('type_group_item');
       typeBlock.initSvg();
       connection.connect(typeBlock.previousConnection);
       connection = typeBlock.nextConnection;
@@ -588,7 +608,7 @@ Blockly.Blocks['type_group_item'] = {
 
 Blockly.Blocks['type_null'] = {
   // Null type.
-  valueType: 'null',
+  valueType: null,
   init: function() {
     this.setColour(230);
     this.appendDummyInput()

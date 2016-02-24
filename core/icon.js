@@ -26,6 +26,9 @@
 
 goog.provide('Blockly.Icon');
 
+goog.require('goog.dom');
+
+
 /**
  * Class for an icon.
  * @param {Blockly.Block} block The block associated with this icon.
@@ -36,9 +39,14 @@ Blockly.Icon = function(block) {
 };
 
 /**
- * Radius of icons.
+ * Does this icon get hidden when the block is collapsed.
  */
-Blockly.Icon.RADIUS = 8;
+Blockly.Icon.prototype.collapseHidden = true;
+
+/**
+ * Height and width of icons.
+ */
+Blockly.Icon.prototype.SIZE = 17;
 
 /**
  * Bubble UI (if visible).
@@ -61,17 +69,21 @@ Blockly.Icon.prototype.iconY_ = 0;
 
 /**
  * Create the icon on the block.
- * @private
  */
-Blockly.Icon.prototype.createIcon_ = function() {
+Blockly.Icon.prototype.createIcon = function() {
   if (this.iconGroup_) {
     // Icon already exists.
     return;
   }
   /* Here's the markup that will be generated:
-  <g class="blocklyIconGroup"></g>
+  <g class="blocklyIconGroup">
+    ...
+  </g>
   */
-  this.iconGroup_ = Blockly.createSvgElement('g', {}, null);
+  this.iconGroup_ = Blockly.createSvgElement('g',
+      {'class': 'blocklyIconGroup'}, null);
+  this.drawIcon_(this.iconGroup_);
+
   this.block_.getSvgRoot().appendChild(this.iconGroup_);
   Blockly.bindEvent_(this.iconGroup_, 'mouseup', this, this.iconClick_);
   this.updateEditable();
@@ -93,12 +105,12 @@ Blockly.Icon.prototype.dispose = function() {
  * Add or remove the UI indicating if this icon may be clicked or not.
  */
 Blockly.Icon.prototype.updateEditable = function() {
-  if (!this.block_.isInFlyout) {
+  if (this.block_.isInFlyout || !this.block_.isEditable()) {
     Blockly.addClass_(/** @type {!Element} */ (this.iconGroup_),
-                      'blocklyIconGroup');
+                      'blocklyIconGroupReadonly');
   } else {
     Blockly.removeClass_(/** @type {!Element} */ (this.iconGroup_),
-                         'blocklyIconGroup');
+                         'blocklyIconGroupReadonly');
   }
 };
 
@@ -116,7 +128,11 @@ Blockly.Icon.prototype.isVisible = function() {
  * @private
  */
 Blockly.Icon.prototype.iconClick_ = function(e) {
-  if (!this.block_.isInFlyout) {
+  if (Blockly.dragMode_ == 2) {
+    // Drag operation is concluding.  Don't open the editor.
+    return;
+  }
+  if (!this.block_.isInFlyout && !Blockly.isRightButton(e)) {
     this.setVisible(!this.isVisible());
   }
 };
@@ -126,8 +142,7 @@ Blockly.Icon.prototype.iconClick_ = function(e) {
  */
 Blockly.Icon.prototype.updateColour = function() {
   if (this.isVisible()) {
-    var hexColour = Blockly.makeColour(this.block_.getColour());
-    this.bubble_.setColour(hexColour);
+    this.bubble_.setColour(this.block_.getColour());
   }
 };
 
@@ -137,24 +152,24 @@ Blockly.Icon.prototype.updateColour = function() {
  * @return {number} Horizontal offset for next item to draw.
  */
 Blockly.Icon.prototype.renderIcon = function(cursorX) {
-  if (this.block_.isCollapsed()) {
+  if (this.collapseHidden && this.block_.isCollapsed()) {
     this.iconGroup_.setAttribute('display', 'none');
     return cursorX;
   }
   this.iconGroup_.setAttribute('display', 'block');
 
   var TOP_MARGIN = 5;
-  var diameter = 2 * Blockly.Icon.RADIUS;
-  if (Blockly.RTL) {
-    cursorX -= diameter;
+  var width = this.SIZE;
+  if (this.block_.RTL) {
+    cursorX -= width;
   }
   this.iconGroup_.setAttribute('transform',
-      'translate(' + cursorX + ', ' + TOP_MARGIN + ')');
+      'translate(' + cursorX + ',' + TOP_MARGIN + ')');
   this.computeIconLocation();
-  if (Blockly.RTL) {
+  if (this.block_.RTL) {
     cursorX -= Blockly.BlockSvg.SEP_SPACE_X;
   } else {
-    cursorX += diameter + Blockly.BlockSvg.SEP_SPACE_X;
+    cursorX += width + Blockly.BlockSvg.SEP_SPACE_X;
   }
   return cursorX;
 };
@@ -180,8 +195,8 @@ Blockly.Icon.prototype.computeIconLocation = function() {
   // Find coordinates for the centre of the icon and update the arrow.
   var blockXY = this.block_.getRelativeToSurfaceXY();
   var iconXY = Blockly.getRelativeXY_(this.iconGroup_);
-  var newX = blockXY.x + iconXY.x + Blockly.Icon.RADIUS;
-  var newY = blockXY.y + iconXY.y + Blockly.Icon.RADIUS;
+  var newX = blockXY.x + iconXY.x + this.SIZE / 2;
+  var newY = blockXY.y + iconXY.y + this.SIZE / 2;
   if (newX !== this.iconX_ || newY !== this.iconY_) {
     this.setIconLocation(newX, newY);
   }

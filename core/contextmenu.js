@@ -27,6 +27,7 @@
 goog.provide('Blockly.ContextMenu');
 
 goog.require('goog.dom');
+goog.require('goog.events');
 goog.require('goog.style');
 goog.require('goog.ui.Menu');
 goog.require('goog.ui.MenuItem');
@@ -42,9 +43,10 @@ Blockly.ContextMenu.currentBlock = null;
  * Construct the menu based on the list of options and show the menu.
  * @param {!Event} e Mouse event.
  * @param {!Array.<!Object>} options Array of menu options.
+ * @param {boolean} rtl True if RTL, false if LTR.
  */
-Blockly.ContextMenu.show = function(e, options) {
-  Blockly.WidgetDiv.show(Blockly.ContextMenu, null);
+Blockly.ContextMenu.show = function(e, options, rtl) {
+  Blockly.WidgetDiv.show(Blockly.ContextMenu, rtl, null);
   if (!options.length) {
     Blockly.ContextMenu.hide();
     return;
@@ -55,16 +57,15 @@ Blockly.ContextMenu.show = function(e, options) {
      callback: Blockly.MakeItSo}
   */
   var menu = new goog.ui.Menu();
+  menu.setRightToLeft(rtl);
   for (var x = 0, option; option = options[x]; x++) {
     var menuItem = new goog.ui.MenuItem(option.text);
+    menuItem.setRightToLeft(rtl);
     menu.addChild(menuItem, true);
     menuItem.setEnabled(option.enabled);
     if (option.enabled) {
-      var evtHandlerCapturer = function(callback) {
-        return function() { Blockly.doCommand(callback); };
-      };
       goog.events.listen(menuItem, goog.ui.Component.EventType.ACTION,
-                         evtHandlerCapturer(option.callback));
+                         option.callback);
     }
   }
   goog.events.listen(menu, goog.ui.Component.EventType.ACTION,
@@ -87,7 +88,7 @@ Blockly.ContextMenu.show = function(e, options) {
     y -= menuSize.height;
   }
   // Flip menu horizontally if off the edge.
-  if (Blockly.RTL) {
+  if (rtl) {
     if (menuSize.width >= e.clientX) {
       x += menuSize.width;
     }
@@ -96,7 +97,7 @@ Blockly.ContextMenu.show = function(e, options) {
       x -= menuSize.width;
     }
   }
-  Blockly.WidgetDiv.position(x, y, windowSize, scrollOffset);
+  Blockly.WidgetDiv.position(x, y, windowSize, scrollOffset, rtl);
 
   menu.setAllowAutoFocus(true);
   // 1ms delay is required for focusing on context menus because some other
@@ -122,16 +123,21 @@ Blockly.ContextMenu.hide = function() {
  */
 Blockly.ContextMenu.callbackFactory = function(block, xml) {
   return function() {
+    Blockly.Events.disable();
     var newBlock = Blockly.Xml.domToBlock(block.workspace, xml);
     // Move the new block next to the old block.
     var xy = block.getRelativeToSurfaceXY();
-    if (Blockly.RTL) {
+    if (block.RTL) {
       xy.x -= Blockly.SNAP_RADIUS;
     } else {
       xy.x += Blockly.SNAP_RADIUS;
     }
     xy.y += Blockly.SNAP_RADIUS * 2;
     newBlock.moveBy(xy.x, xy.y);
+    Blockly.Events.enable();
+    if (Blockly.Events.isEnabled() && !newBlock.isShadow()) {
+      Blockly.Events.fire(new Blockly.Events.Create(newBlock));
+    }
     newBlock.select();
   };
 };

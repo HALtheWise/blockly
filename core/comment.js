@@ -39,10 +39,9 @@ goog.require('goog.userAgent');
  */
 Blockly.Comment = function(block) {
   Blockly.Comment.superClass_.constructor.call(this, block);
-  this.createIcon_();
+  this.createIcon();
 };
 goog.inherits(Blockly.Comment, Blockly.Icon);
-
 
 /**
  * Comment text (if bubble is not visible).
@@ -63,25 +62,27 @@ Blockly.Comment.prototype.width_ = 160;
 Blockly.Comment.prototype.height_ = 80;
 
 /**
- * Create the icon on the block.
+ * Draw the comment icon.
+ * @param {!Element} group The icon group.
  * @private
  */
-Blockly.Comment.prototype.createIcon_ = function() {
-  Blockly.Icon.prototype.createIcon_.call(this);
-  /* Here's the markup that will be generated:
-  <circle class="blocklyIconShield" r="8" cx="8" cy="8"/>
-  <text class="blocklyIconMark" x="8" y="13">?</text>
-  */
-  var iconShield = Blockly.createSvgElement('circle',
-      {'class': 'blocklyIconShield',
-       'r': Blockly.Icon.RADIUS,
-       'cx': Blockly.Icon.RADIUS,
-       'cy': Blockly.Icon.RADIUS}, this.iconGroup_);
-  this.iconMark_ = Blockly.createSvgElement('text',
-      {'class': 'blocklyIconMark',
-       'x': Blockly.Icon.RADIUS,
-       'y': 2 * Blockly.Icon.RADIUS - 3}, this.iconGroup_);
-  this.iconMark_.appendChild(document.createTextNode('?'));
+Blockly.Comment.prototype.drawIcon_ = function(group) {
+  // Circle.
+  Blockly.createSvgElement('circle',
+      {'class': 'blocklyIconShape', 'r': '8', 'cx': '8', 'cy': '8'},
+       group);
+  // Can't use a real '?' text character since different browsers and operating
+  // systems render it differently.
+  // Body of question mark.
+  Blockly.createSvgElement('path',
+      {'class': 'blocklyIconSymbol',
+       'd': 'm6.8,10h2c0.003,-0.617 0.271,-0.962 0.633,-1.266 2.875,-2.405 0.607,-5.534 -3.765,-3.874v1.7c3.12,-1.657 3.698,0.118 2.336,1.25 -1.201,0.998 -1.201,1.528 -1.204,2.19z'},
+       group);
+  // Dot of question point.
+  Blockly.createSvgElement('rect',
+      {'class': 'blocklyIconSymbol',
+       'x': '6.8', 'y': '10.78', 'height': '2', 'width': '2'},
+       group);
 };
 
 /**
@@ -107,10 +108,22 @@ Blockly.Comment.prototype.createEditor_ = function() {
   body.className = 'blocklyMinimalBody';
   this.textarea_ = document.createElementNS(Blockly.HTML_NS, 'textarea');
   this.textarea_.className = 'blocklyCommentTextarea';
-  this.textarea_.setAttribute('dir', Blockly.RTL ? 'RTL' : 'LTR');
+  this.textarea_.setAttribute('dir', this.block_.RTL ? 'RTL' : 'LTR');
   body.appendChild(this.textarea_);
   this.foreignObject_.appendChild(body);
   Blockly.bindEvent_(this.textarea_, 'mouseup', this, this.textareaFocus_);
+  // Don't zoom with mousewheel.
+  Blockly.bindEvent_(this.textarea_, 'wheel', this, function(e) {
+    e.stopPropagation();
+  });
+  Blockly.bindEvent_(this.textarea_, 'change', this, function(e) {
+    if (this.text_ != this.textarea_.value) {
+      Blockly.Events.fire(new Blockly.Events.Change(
+        this.block_, 'comment', null, this.text_, this.textarea_.value));
+      this.text_ = this.textarea_.value;
+    }
+  });
+
   return this.foreignObject_;
 };
 
@@ -171,7 +184,6 @@ Blockly.Comment.prototype.setVisible = function(visible) {
         this.width_, this.height_);
     this.bubble_.registerResizeEvent(this, this.resizeBubble_);
     this.updateColour();
-    this.text_ = null;
   } else {
     // Dispose of the bubble.
     this.bubble_.dispose();
@@ -238,10 +250,13 @@ Blockly.Comment.prototype.getText = function() {
  * @param {string} text Comment text.
  */
 Blockly.Comment.prototype.setText = function(text) {
+  if (this.text_ != text) {
+    Blockly.Events.fire(new Blockly.Events.Change(
+      this.block_, 'comment', null, this.text_, text));
+    this.text_ = text;
+  }
   if (this.textarea_) {
     this.textarea_.value = text;
-  } else {
-    this.text_ = text;
   }
 };
 
@@ -249,6 +264,9 @@ Blockly.Comment.prototype.setText = function(text) {
  * Dispose of this comment.
  */
 Blockly.Comment.prototype.dispose = function() {
+  if (Blockly.Events.isEnabled()) {
+    this.setText('');  // Fire event to delete comment.
+  }
   this.block_.comment = null;
   Blockly.Icon.prototype.dispose.call(this);
 };
